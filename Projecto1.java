@@ -2,10 +2,10 @@ import java.util.Random;
 import java.util.ArrayList;
 
 public class Projecto1{
-	public int NWOLFS=30, NSHEEPS=100, SHEEPENERGY=20;
+	public int NWOLFS=2, NSHEEPS=5, SHEEPENERGY=20, WIDTH=6, HEIGHT=6;
 	public int it;
 
-	Cell[][] current = new Cell[51][51];
+	Cell[][] current = new Cell[HEIGHT][WIDTH];
 	Cell[][] next;
 	public int nSheeps=NSHEEPS, nWolfs = NWOLFS;
 	
@@ -23,31 +23,56 @@ public class Projecto1{
 			}
 		}
 		for(i=0; i<NWOLFS; i++){
-			current[randInt(0, 50)][randInt(0, 50)].addAnimal(
+			current[randInt(0, HEIGHT-1)][randInt(0, WIDTH-1)].addAnimal(
 				new Wolf((double)randInt(0, 30)) );
 		}
 		for(i=0; i<NSHEEPS; i++){
-			current[randInt(0, 50)][randInt(0, 50)].addAnimal(
+			current[randInt(0, HEIGHT-1)][randInt(0, WIDTH-1)].addAnimal(
 				new Sheep((double)randInt(0, 7)) );
 		}
 
 	}
-	public boolean wolfActions(Cell curC, Cell nextC){
-		double energy;
-		for(Wolf wolf: curC.wolfs){
-			energy = wolf.energy + curC.sheeps.size() / curC.wolfs.size() - 1;
-			if(curC.sheeps.size() > 0){
-				System.out.println("Eating, iteration " + it);
-			}
 
+	public Cell getNextCell(int x, int y){
+		int nx=x, ny=y;
+
+		while(nx == x && ny == y){
+			if(x > 0 && x < WIDTH-1){
+				nx = x + randInt(-1, 1);
+			}else if(x > 0){
+				nx = x + randInt(-1, 0);
+			}else if(x < WIDTH-1){
+				nx = x + randInt(0, 1);
+			}
+			if(y > 0 && y < HEIGHT-1){
+				ny = y + randInt(-1, 1);
+			}else if(y > 0){
+				ny = y + randInt(-1, 0);
+			}else if(y < HEIGHT-1){
+				ny = y + randInt(0, 1);
+			}
+			
+		}
+		return next[ny][nx];
+
+	}
+
+	public boolean wolfActions(Cell curC, int x, int y){
+		double energy;
+		Cell nextC;
+		for(Wolf wolf: curC.wolfs){
+			energy = wolf.energy + (curC.sheeps.size() / (float)curC.wolfs.size())*20 - 1;
+			if(curC.sheeps.size() > 0){
+				System.out.println("Wolf eating, iteration " + it);
+			}
 			if(energy > 0){
+				nextC = getNextCell(x, y);
 				nextC.addAnimal(new Wolf(energy));
 			}else{
 				nWolfs--;
 				System.out.println("Wolf died, iteration " + it + ", n wolfs " + nWolfs);
 			}
 		}
-		//System.out.println(curC.wolfs.size());
 		if(curC.wolfs.size() > 0){
 			return false;
 		}else{
@@ -55,36 +80,58 @@ public class Projecto1{
 		}
 	}
 
-	public void sheepActions(Cell curC, Cell nextC){
+	public void sheepActions(Cell curC, int x, int y){
 		double energy;
+		Cell nextC = null;
 		for(Sheep sheep: curC.sheeps){
-			energy = sheep.energy + curC.grass / curC.sheeps.size() - 1;
+			energy = sheep.energy - 1;
+			if(curC.grass == 30){
+				System.out.println("Sheep eating, iteration " + it);
+				energy += 4 / curC.sheeps.size();
+				if(energy > 7)
+					energy = 7;
+				next[y][x].grass = 0;
+			}
+			
 			if(energy > 0){
+				nextC = getNextCell(x, y);
 				nextC.addAnimal(new Sheep(energy));
-				nextC.grass = 0;
 			}else{
+				nSheeps--;
 				System.out.println("Sheep died, iteration " + it);
 			}
 		}
 	}
 
 	public void iteration(){
-		next = new Cell[51][51];
+		next = new Cell[HEIGHT][WIDTH];
 		
-		for(int y=0; y<51; y++){
-			for(int x=0; x<51; x++){
-				//System.out.print(current[y][x].grass + " ");
+		for(int y=0; y<HEIGHT; y++)
+			for(int x=0; x<WIDTH; x++)
 				next[y][x] = new Cell(current[y][x].grass);
+
+		for(int y=0; y<HEIGHT; y++){
+			for(int x=0; x<WIDTH; x++){
+				//System.out.print(current[y][x].grass + " ");
 				
-				if(wolfActions(current[y][x], next[y][x]))
-					sheepActions(current[y][x], next[y][x]);
+				if(wolfActions(current[y][x], x, y))
+					sheepActions(current[y][x], x, y);
 
 				if(next[y][x].grass < 30)
 					next[y][x].grass++;
 			}
 			//System.out.println();
 		}
-		//System.out.println();
+		
+		for(int y=0; y<HEIGHT; y++){
+			for(int x=0; x<WIDTH; x++){
+				System.out.print(current[y][x].wolfs.size() + "W" + current[y][x].sheeps.size() + "S-" + current[y][x].grass + "\t");
+			}
+			System.out.println();
+		}
+		System.out.println();
+		
+		System.out.println("nWolfs: " + nWolfs + " nSheeps: " + nSheeps);
 
 		current = next;
 	}
@@ -92,9 +139,10 @@ public class Projecto1{
 	public Projecto1(){
 		init();
 
-		for(it=0; it<40; it++){
+		for(it=0; it<10; it++){
 			iteration();
 		}
+		System.out.println(nWolfs + " " + nSheeps);
 	}
 	public static void main(String[] args){
 		new Projecto1();
