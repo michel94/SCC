@@ -2,8 +2,9 @@ import java.util.Random;
 import java.util.ArrayList;
 
 public class Projecto1{
-	//public int NWOLFS=2, NSHEEPS=15, SHEEPENERGY=20, WIDTH=8, HEIGHT=8;
-	public int NWOLFS=30, NSHEEPS=100, SHEEPENERGY=7, WOLFENERGY=30, WIDTH=51, HEIGHT=51, ITERATIONS=5000;
+
+	public int NWOLFS=30, NSHEEPS=100, SHEEPENERGY=7, WOLFENERGY=90, WIDTH=51, HEIGHT=51, ITERATIONS=5000; 
+	//Alteracoes necessarias para garantir a sobrevivencia de lobos e ovelhas: "energia maxima dos lobos"=90, "energia ganha por ovelha comida"=40 e "crescimento da erva por iteracao"=2
 	
 	public int it;
 
@@ -27,7 +28,7 @@ public class Projecto1{
 		}
 		for(i=0; i<NWOLFS; i++){
 			current[randInt(0, HEIGHT-1)][randInt(0, WIDTH-1)].addAnimal(
-				new Wolf((double)randInt(1, WOLFENERGY)) );
+				new Wolf((double)randInt(1, 30)) );
 		}
 		for(i=0; i<NSHEEPS; i++){
 			current[randInt(0, HEIGHT-1)][randInt(0, WIDTH-1)].addAnimal(
@@ -64,23 +65,21 @@ public class Projecto1{
 		double energy;
 		Cell nextC;
 		for(Wolf wolf: curC.wolfs){
-			energy = wolf.energy + (curC.sheeps.size() / (double)curC.wolfs.size())*20 - 1;
-			//if(energy > WOLFENERGY)
-			//	energy = WOLFENERGY;
+			energy = wolf.energy + (curC.sheeps.size() / (double)curC.wolfs.size())*40 - 1;
+			//System.out.println("Energy " + wolf.energy + " " + energy);
+			if(energy > WOLFENERGY)
+				energy = WOLFENERGY;
 
 			nSheeps -= curC.sheeps.size() / (float)curC.wolfs.size();
-			if(curC.sheeps.size() > 0){
-				System.out.println("Wolf eating, iteration " + it + " " + curC.sheeps.size() + " sheeps" );
-			}
-			//System.out.println("wolf energy " + energy);
+			
 			if(energy > 0){
-				if(randInt(0, 100) < 4){
+				if(randInt(0, 99) < 5){
 					nextC = getNextCell(x, y);
 					Cell nextC2 = getNextCell(x, y);
 					nextC.addAnimal(new Wolf(energy/2));
 					nextC2.addAnimal(new Wolf(energy/2));
 					nWolfs++;
-					System.out.println("wolf reproduction nWolfs: " + nWolfs);
+					//System.out.println("wolf reproduction nWolfs: " + nWolfs);
 				}else{
 					nextC = getNextCell(x, y);
 					nextC.addAnimal(new Wolf(energy));
@@ -88,7 +87,7 @@ public class Projecto1{
 
 			}else{
 				nWolfs--;
-				System.out.println("Wolf died, iteration " + it + ", n wolfs " + nWolfs);
+				//System.out.println("Wolf died, iteration " + it + ", n wolfs " + nWolfs);
 			}
 		}
 		if(curC.wolfs.size() > 0){
@@ -103,7 +102,7 @@ public class Projecto1{
 		Cell nextC = null;
 		for(Sheep sheep: curC.sheeps){
 			energy = sheep.energy - 1;
-			if(curC.grass == 30){
+			if(curC.grass >= 30){
 				//System.out.println("Sheep eating, iteration " + it);
 				energy += 4.0 / curC.sheeps.size();
 				if(energy > 7)
@@ -112,7 +111,7 @@ public class Projecto1{
 			}
 			
 			if(energy > 0){
-				if(randInt(0, 100) < 4){
+				if(randInt(0, 99) < 4){
 					nextC = getNextCell(x, y);
 					Cell nextC2 = getNextCell(x, y);
 					nextC.addAnimal(new Sheep(energy/2));
@@ -145,7 +144,7 @@ public class Projecto1{
 					sheepActions(current[y][x], x, y);
 
 				if(next[y][x].grass < 30)
-					next[y][x].grass++;
+					next[y][x].grass+=2;
 			}
 			//System.out.println();
 		}
@@ -181,7 +180,6 @@ public class Projecto1{
 			System.out.println(results[i][0] + " " + results[i][1]);
 		}
 		
-		System.out.println(nWolfs + " " + nSheeps);
 	}
 	public static void main(String[] args){
 		new Projecto1();
