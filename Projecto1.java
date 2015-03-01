@@ -12,6 +12,7 @@ public class Projecto1{
 	Cell[][] next;
 	public int nWolfs = NWOLFS;
 	public float nSheeps = NSHEEPS;
+	public int nVegetation;
 	
 	public Random random = new Random();
 
@@ -136,6 +137,7 @@ public class Projecto1{
 			for(int x=0; x<WIDTH; x++)
 				next[y][x] = new Cell(current[y][x].grass);
 
+		nVegetation = 0;
 		for(int y=0; y<HEIGHT; y++){
 			for(int x=0; x<WIDTH; x++){
 				//System.out.print(current[y][x].grass + " ");
@@ -145,6 +147,9 @@ public class Projecto1{
 
 				if(next[y][x].grass < 30)
 					next[y][x].grass+=2;
+
+				if(next[y][x].grass >= 30)
+					nVegetation++;
 			}
 			//System.out.println();
 		}
@@ -165,19 +170,21 @@ public class Projecto1{
 	public Projecto1(){
 		init();
 		int i;
-		int[][] results = new int[ITERATIONS+1][2];
+		int[][] results = new int[ITERATIONS+1][3];
 
 		for(it=0; it<ITERATIONS; it++){
 			results[it][0] = nWolfs;
 			results[it][1] = (int)nSheeps;
+			results[it][2] = (int)nVegetation;
 			iteration();
 		}
 		results[ITERATIONS][0] = nWolfs;
 		results[ITERATIONS][1] = (int)nSheeps;
+		results[ITERATIONS][2] = (int)nVegetation;
 
 		System.out.println("Wolfs | Sheeps");
 		for(i=0; i<=ITERATIONS; i++){
-			System.out.println(results[i][0] + " " + results[i][1]);
+			System.out.println(results[i][0] + " " + results[i][1] + " " + results[i][2]);
 		}
 		
 	}
