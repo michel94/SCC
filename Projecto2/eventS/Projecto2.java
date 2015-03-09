@@ -1,3 +1,5 @@
+package eventS;
+
 import eventS.*;
 
 public class Projecto2{
@@ -12,9 +14,12 @@ public class Projecto2{
 		new Projecto2();
 	}
 }
-/*
+
 class MyModel extends Model{
-	private void init(){
+	public MyModel(){
+		
+	}
+	public void init(){
 
 	}
-}*/
+}
