@@ -13,7 +13,12 @@ class Token {
 	private double arrivalTick;
 	private double serviceTick;
 	private double endTick;
-	public Token(double arrivalTick) {this.arrivalTick = this.serviceTick = arrivalTick;}
+	public int id;
+	public Token(double arrivalTick) {
+		Random r = new Random();
+		id = Math.abs(r.nextInt() % 1000);
+		this.arrivalTick = this.serviceTick = arrivalTick;
+	}
 	public double waitTime() {return serviceTick - arrivalTick;}
 	public double cycleTime(double time) {return time - arrivalTick;}
 	public double cycleTime() {return endTick - arrivalTick;}
@@ -36,6 +41,7 @@ final class DrinksDeparture extends Event{
 	}
 	@Override
 	public void execute() {
+		System.out.println("DrinksDeparture at " + time + " client: " + client.id);
 		client.serviceTick(time);
 
 	}
@@ -60,7 +66,7 @@ final class HotFoodDeparture extends Event{
 			model.delayTime.add(client.waitTime());
 			model.schedule(this, model.hotFoodDist.next());
 			model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
-			System.out.println("HotFood Departure " + time + " queue size " + model.hotFoodQueue.value() );
+			System.out.println("HotFood Departure " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 		}
 		else {
 			model.restHotFood.inc(-1, time);
@@ -79,7 +85,6 @@ final class SandwichesDeparture extends Event{
 	}
 	@Override
 	public void execute() {
-		System.out.println("Sandwich Departure");
 		Token client;
 
 		if (model.sandwichesQueue.value() > 0) {
@@ -89,7 +94,7 @@ final class SandwichesDeparture extends Event{
 			model.delayTime.add(client.waitTime());
 			model.schedule(this, model.sandwichesDist.next());
 			model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
-			System.out.println("Sandwich Departure " + time + " queue size " + model.hotFoodQueue.value() );
+			System.out.println("Sandwich Departure " + time  + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 		}
 		else {
 			model.restSandwiches.inc(-1, time);
