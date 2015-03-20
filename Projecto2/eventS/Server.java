@@ -57,20 +57,19 @@ final class HotFoodDeparture extends Event{
 	}
 	@Override
 	public void execute() {
-		Token client, curClient = this.client;
+		
+		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
+		client.serviceTick(time);
+		System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 
 		if (model.hotFoodQueue.value() > 0) {
 			model.hotFoodQueue.inc(-1, time);
 			client = model.hotFood.remove(0);
-			client.serviceTick(time);
 			model.schedule(this, model.hotFoodDist.next());
-			System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 		}
 		else {
 			model.restHotFood.inc(-1, time);
 		}
-
-		model.schedule(new DrinksDeparture(model, curClient), model.drinksDist.next());
 		
 	}
 }
@@ -85,19 +84,20 @@ final class SandwichesDeparture extends Event{
 	}
 	@Override
 	public void execute() {
-		Token client, c=this.client;
 
+		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
+		client.serviceTick(time);
+		System.out.println("Sandwich Departure " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
+		
 		if (model.sandwichesQueue.value() > 0) {
 			model.sandwichesQueue.inc(-1, time);
 			client = model.sandwiches.remove(0);
-			client.serviceTick(time);
 			model.schedule(this, model.sandwichesDist.next());
-			model.schedule(new DrinksDeparture(model, c), model.drinksDist.next());
-			System.out.println("Sandwich Departure " + time  + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 		}
 		else {
 			model.restSandwiches.inc(-1, time);
 		}
+
 		
 	}
 }
@@ -111,19 +111,11 @@ final class Arrival extends Event {
 	@Override
 	public void execute() {
 		Token client = new Token(time);
-		/*if (model.rest.value() > 0) {
-			model.rest.inc(-1, time);
-			model.schedule(new Departure(model, client), model.service.next());
-		}
-		else {
-			model.queue.inc(1, time);
-			model.line.add(client);
-		}*/
 		
 		double q = model.choiceDist.next();
-		System.out.println("Arrival at " + q);
 		
-		if(q == 0){
+		if(q == 0.0){
+			System.out.println("Arrival at " + q);
 			if(model.restHotFood.value() > 0){ // hotfood queue empty
 				model.restHotFood.inc(-1, time);
 				model.schedule(new HotFoodDeparture(model, client), model.hotFoodDist.next());
@@ -132,7 +124,8 @@ final class Arrival extends Event {
 				model.hotFood.add(client);
 			}
 		}
-		else if(q == 1){
+		else if(q == 1.0){
+			System.out.println("Arrival at " + q);
 			if(model.restSandwiches.value() > 0){
 				model.restSandwiches.inc(-1, time);
 				model.schedule(new SandwichesDeparture(model, client), model.sandwichesDist.next());
@@ -141,14 +134,15 @@ final class Arrival extends Event {
 				model.sandwiches.add(client);
 			}
 
-		}else{
+		}else if(q == 2.0){
+			System.out.println("Arrival at " + q);
 			model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 			
+		}else{
+			System.out.println("WTF");
 		}
-		/*else
-			drinks here
-			
-		*/
+		
+
 		double t = model.arrivalDist.next();
 		//System.out.println("new arrival in " + t);
 		model.schedule(this, t);
