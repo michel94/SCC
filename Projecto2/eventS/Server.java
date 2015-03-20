@@ -63,10 +63,9 @@ final class HotFoodDeparture extends Event{
 			model.hotFoodQueue.inc(-1, time);
 			client = model.hotFood.remove(0);
 			client.serviceTick(time);
-			model.delayTime.add(client.waitTime());
 			model.schedule(this, model.hotFoodDist.next());
 			model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
-			System.out.println("HotFood Departure " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
+			System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 		}
 		else {
 			model.restHotFood.inc(-1, time);
@@ -85,15 +84,14 @@ final class SandwichesDeparture extends Event{
 	}
 	@Override
 	public void execute() {
-		Token client;
+		Token client, c=this.client;
 
 		if (model.sandwichesQueue.value() > 0) {
 			model.sandwichesQueue.inc(-1, time);
 			client = model.sandwiches.remove(0);
 			client.serviceTick(time);
-			model.delayTime.add(client.waitTime());
 			model.schedule(this, model.sandwichesDist.next());
-			model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
+			model.schedule(new DrinksDeparture(model, c), model.drinksDist.next());
 			System.out.println("Sandwich Departure " + time  + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 		}
 		else {
@@ -125,7 +123,7 @@ final class Arrival extends Event {
 		System.out.println("Arrival at " + q);
 		
 		if(q == 0){
-			if(model.restHotFood.value() > 0){
+			if(model.restHotFood.value() > 0){ // hotfood queue empty
 				model.restHotFood.inc(-1, time);
 				model.schedule(new HotFoodDeparture(model, client), model.hotFoodDist.next());
 			}else{
@@ -166,10 +164,7 @@ final class Stop extends Event {
 	}
 	@Override
 	public void execute() {
-		System.out.format("%.2f\t%.2f\t%.2f\n",
-			model.queue.mean(time),
-			model.rest.mean(time), model.delayTime.mean()
-		);
+		System.out.println("End");
 		model.clear();
 	}
 }
@@ -179,7 +174,6 @@ final class Server extends Model {
 	final Accumulate restSandwiches, restHotFood, rest;
 	public final List<Token> sandwiches, hotFood;
 	public final List<Token>[] cashiers;
-	final Average delayTime;
 	final Uniform hotFoodDist, sandwichesDist, drinksDist;
 	final Discrete choiceDist;
 	final Exponential arrivalDist;
@@ -197,8 +191,6 @@ final class Server extends Model {
 		sandwiches = new ArrayList<>();
 		hotFood = new ArrayList<>();
 		cashiers = new ArrayList[3]; //TODO: fix this warning
-
-		this.delayTime = new Average();
 		
 		arrivalDist = new Exponential((int)new Date().getTime(), 30.0);
 		hotFoodDist = new Uniform((int)new Date().getTime(), 50.0, 120.0);
