@@ -13,11 +13,18 @@ class Token {
 	private double arrivalTick;
 	private double serviceTick;
 	private double endTick;
+	private double cashierTime;
 	public int id;
 	public Token(double arrivalTick) {
 		Random r = new Random();
 		id = Math.abs(r.nextInt() % 1000);
 		this.arrivalTick = this.serviceTick = arrivalTick;
+	}
+	public void addCashierTime(double t){
+		cashierTime += t;
+	}
+	public double cashierTime(){
+		return cashierTime;
 	}
 	public double waitTime() {return serviceTick - arrivalTick;}
 	public double cycleTime(double time) {return time - arrivalTick;}
@@ -42,6 +49,7 @@ final class DrinksDeparture extends Event{
 	@Override
 	public void execute() {
 		System.out.println("DrinksDeparture at " + time + " client: " + client.id);
+		System.out.println("Accumulated Time " + client.cashierTime());
 		client.serviceTick(time);
 
 	}
@@ -58,13 +66,15 @@ final class HotFoodDeparture extends Event{
 	@Override
 	public void execute() {
 		
-		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 		client.serviceTick(time);
+		client.addCashierTime(model.drinksExtraDist.next());
+		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 		System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 
 		if (model.hotFoodQueue.value() > 0) {
 			model.hotFoodQueue.inc(-1, time);
 			client = model.hotFood.remove(0);
+			client.addCashierTime(model.hotFoodExtraDist.next());
 			model.schedule(this, model.hotFoodDist.next());
 		}
 		else {
@@ -85,13 +95,15 @@ final class SandwichesDeparture extends Event{
 	@Override
 	public void execute() {
 
-		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 		client.serviceTick(time);
+		client.addCashierTime(model.drinksExtraDist.next());
+		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 		System.out.println("Sandwich Departure " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 		
 		if (model.sandwichesQueue.value() > 0) {
 			model.sandwichesQueue.inc(-1, time);
 			client = model.sandwiches.remove(0);
+			client.addCashierTime(model.sandwichesExtraDist.next());
 			model.schedule(this, model.sandwichesDist.next());
 		}
 		else {
@@ -111,43 +123,44 @@ final class Arrival extends Event {
 	public void execute() {
 		Token client = new Token(time);
 		
-		double q = model.choiceDist.next();
+		double q, g = model.groupsDist.next(); 
+		System.out.println("Group with " + g + " elements");
 		
-		if(q == 0.0){
-			System.out.println("Arrival at " + q);
-			if(model.restHotFood.value() > 0){ // hotfood queue empty
-				model.restHotFood.inc(-1, time);
-				model.schedule(new HotFoodDeparture(model, client), model.hotFoodDist.next());
-			}else{
-				model.hotFoodQueue.inc(1, time);
-				model.hotFood.add(client);
-			}
-		}
-		else if(q == 1.0){
-			System.out.println("Arrival at " + q);
-			if(model.restSandwiches.value() > 0){
-				model.restSandwiches.inc(-1, time);
-				model.schedule(new SandwichesDeparture(model, client), model.sandwichesDist.next());
-			}else{
-				model.sandwichesQueue.inc(1, time);
-				model.sandwiches.add(client);
-			}
-
-		}else if(q == 2.0){
-			System.out.println("Arrival at " + q);
-			model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
+		for(int i=0; i<g; i++){
+			q = model.choiceDist.next();
 			
-		}else{
-			System.out.println("WTF");
+			if(q == 0.0){
+				System.out.println("Arrival at " + q + " time " + time + " queue " + model.hotFoodQueue.value());
+				if(model.restHotFood.value() > 0){ // hotfood not working
+					model.restHotFood.inc(-1, time);
+					client.addCashierTime(model.hotFoodExtraDist.next());
+					model.schedule(new HotFoodDeparture(model, client), model.hotFoodDist.next());
+				}else{
+					model.hotFoodQueue.inc(1, time);
+					model.hotFood.add(client);
+				}
+			}
+			else if(q == 1.0){
+				System.out.println("Arrival at " + q + " time " + time + " queue " + model.sandwichesQueue.value());
+				if(model.restSandwiches.value() > 0){
+					model.restSandwiches.inc(-1, time);
+					client.addCashierTime(model.hotFoodExtraDist.next());
+					model.schedule(new SandwichesDeparture(model, client), model.sandwichesDist.next());
+				}else{
+					model.sandwichesQueue.inc(1, time);
+					model.sandwiches.add(client);
+				}
+			}else if(q == 2.0){
+				System.out.println("Arrival at " + q + " time " + time);
+				client.addCashierTime(model.drinksExtraDist.next());
+				model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
+			}
+			
 		}
-		
-
-		double t = model.arrivalDist.next();
-		//System.out.println("new arrival in " + t);
-		model.schedule(this, t);
-		
+		model.schedule(this, model.arrivalDist.next());
 
 	}
+
 }
 
 final class Stop extends Event {
@@ -159,6 +172,7 @@ final class Stop extends Event {
 	@Override
 	public void execute() {
 		System.out.println("End");
+		System.out.println("HotFood queue mean size: " + model.hotFoodQueue.mean(time));
 		model.clear();
 	}
 }
@@ -168,8 +182,8 @@ final class Server extends Model {
 	final Accumulate restSandwiches, restHotFood, rest;
 	public final List<Token> sandwiches, hotFood;
 	public final List<Token>[] cashiers;
-	final Uniform hotFoodDist, sandwichesDist, drinksDist;
-	final Discrete choiceDist;
+	final Uniform hotFoodDist, sandwichesDist, drinksDist, hotFoodExtraDist, sandwichesExtraDist, drinksExtraDist;
+	final Discrete choiceDist, groupsDist;
 	final Exponential arrivalDist;
 	public Server(int n) {
 		super();
@@ -190,9 +204,15 @@ final class Server extends Model {
 		hotFoodDist = new Uniform((int)new Date().getTime(), 50.0, 120.0);
 		sandwichesDist = new Uniform((int)new Date().getTime(), 60.0, 180.0);
 		drinksDist = new Uniform((int)new Date().getTime(), 5.0, 20.0);
-		double[] a = {0, 1, 2};
-		double[] p = {0.8, 0.15, 0.05};
-		choiceDist = new Discrete((int)new Date().getTime(), a, p);
+
+		hotFoodExtraDist = new Uniform((int)new Date().getTime(), 20.0, 40.0);
+		sandwichesExtraDist = new Uniform((int)new Date().getTime(), 5.0, 15.0);
+		drinksExtraDist = new Uniform((int)new Date().getTime(), 5.0, 10.0);
+
+		choiceDist = new Discrete((int)new Date().getTime(), new double[]{0, 1, 2}, new double[]{0.8, 0.15, 0.05});
+		groupsDist = new Discrete((int)new Date().getTime(), new double[]{1, 2, 3, 4}, new double[]{0.5, 0.3, 0.1, 0.1});
+
+
 	}
 	@Override
 	protected void init() {
