@@ -57,19 +57,20 @@ final class HotFoodDeparture extends Event{
 	}
 	@Override
 	public void execute() {
-		Token client;
+		Token client, curClient = this.client;
 
 		if (model.hotFoodQueue.value() > 0) {
 			model.hotFoodQueue.inc(-1, time);
 			client = model.hotFood.remove(0);
 			client.serviceTick(time);
 			model.schedule(this, model.hotFoodDist.next());
-			model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 			System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 		}
 		else {
 			model.restHotFood.inc(-1, time);
 		}
+
+		model.schedule(new DrinksDeparture(model, curClient), model.drinksDist.next());
 		
 	}
 }
