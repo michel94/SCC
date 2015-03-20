@@ -97,7 +97,6 @@ final class SandwichesDeparture extends Event{
 		else {
 			model.restSandwiches.inc(-1, time);
 		}
-
 		
 	}
 }
