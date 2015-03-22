@@ -94,7 +94,7 @@ class Accumulate {
 		accum += value * delta;
 		this.value = v;
 		if(this.value > max)
-			max = this.value
+			max = this.value;
 		last = time;
 	}
 	public double mean(double time) {return integral(time) / time;}

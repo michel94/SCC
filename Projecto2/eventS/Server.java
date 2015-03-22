@@ -243,21 +243,21 @@ final class Stop extends Event {
 		System.out.println("1 - Cashier mean delay time: " + model.cashierMeanDelayTime.mean());
 
 		/* SECOND POINT STATISTICS */
-		System.out.println("2 - time-average sandwichesQueue: " + model.sandwichesQueue.mean());
-		System.out.println("2 - time-average hotFoodQueue: " + model.hotFoodQueue.mean());
+		System.out.println("2 - time-average sandwichesQueue: " + model.sandwichesQueue.mean(time));
+		System.out.println("2 - time-average hotFoodQueue: " + model.hotFoodQueue.mean(time));
 		double timeAverageCashier = 0;
 		for(int i=0;i<model.cashiersQueue.length;i++)
 		{
-			timeAverageCashier += model.cashiersQueue[i].mean();
+			timeAverageCashier += model.cashiersQueue[i].mean(time);
 		}
 		timeAverageCashier = timeAverageCashier/model.cashiersQueue.length;
 		System.out.println("2 - time-average cashiers: " + timeAverageCashier);
-		System.out.println("2 - max number sandwichesQueue: " + model.sandwichesQueue.mean());
-		System.out.println("2 - max number hotFoodQueue: " + model.hotFoodQueue.mean());
+		System.out.println("2 - max number sandwichesQueue: " + model.sandwichesQueue.max());
+		System.out.println("2 - max number hotFoodQueue: " + model.hotFoodQueue.max());
 		double maxNumberCashier = 0;
 		for(int i=0;i<model.cashiersQueue.length;i++)
 		{
-			if(maxNumberCashier < model.cashiersQueue[i].max)
+			if(maxNumberCashier < model.cashiersQueue[i].max())
 				maxNumberCashier = model.cashiersQueue[i].max();
 		}
 		System.out.println("2 - max number cashiers: " + maxNumberCashier);
@@ -267,8 +267,8 @@ final class Stop extends Event {
 		/* FORTH POINT STATISTICS */
 
 		/* FIFTH POINT STATISTICS */
-		System.out.println("Mean time per user: " + model.overallMeanTime.mean());
-		System.out.println("Total users: " + model.overallMeanTime.count());
+		System.out.println("5 - Mean time per user: " + model.overallMeanTime.mean());
+		System.out.println("5 - Total users: " + model.overallMeanTime.count());
 		model.clear();
 	}
 }
