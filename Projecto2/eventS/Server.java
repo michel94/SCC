@@ -61,6 +61,8 @@ final class CashiersDeparture extends Event{
 		model.cashierMeanDelayTime.add(client.waitCashierTime());
 		model.cashierMaxDelayTime.add(client.waitCashierTime());
 
+		model.overallMeanTime.add(client.cycleTime());
+
 		if(model.cashiersQueue[cashier].value() > 0){
 			model.cashiersQueue[cashier].inc(-1, time);
 			client = model.cashiers[cashier].remove(0);
@@ -239,7 +241,8 @@ final class Stop extends Event {
 		System.out.println("HotFood mean delay time: " + model.hotFoodMeanDelayTime.mean());
 		System.out.println("Cashier mean delay time: " + model.cashierMeanDelayTime.mean());
 
-		System.out.println("HotFood queue mean size: " + model.hotFoodQueue.mean(time));
+		System.out.println("Mean time per user: " + model.overallMeanTime.mean());
+		System.out.println("Total users: " + model.overallMeanTime.count());
 		model.clear();
 	}
 }
@@ -247,7 +250,7 @@ final class Stop extends Event {
 final class Server extends Model {
 	final Accumulate hotFoodQueue, sandwichesQueue;
 	final Accumulate restSandwiches, restHotFood;
-	public final Average sandwichesMeanDelaytime, hotFoodMeanDelayTime, cashierMeanDelayTime;
+	public final Average sandwichesMeanDelaytime, hotFoodMeanDelayTime, cashierMeanDelayTime, overallMeanTime;
 	public final Max sandwichesMaxDelaytime, hotFoodMaxDelayTime, cashierMaxDelayTime;
 	public final List<Token> sandwiches, hotFood;
 	public final ArrayList<Token>[] cashiers;
@@ -273,6 +276,7 @@ final class Server extends Model {
 		sandwichesMeanDelaytime = new Average();
 		hotFoodMeanDelayTime = new Average();
 		cashierMeanDelayTime = new Average();
+		overallMeanTime = new Average();
 
 		sandwichesMaxDelaytime = new Max();
 		hotFoodMaxDelayTime = new Max();
