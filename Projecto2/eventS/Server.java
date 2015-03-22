@@ -37,7 +37,8 @@ class Token {
 	public void foodTick(double foodTick) {this.foodTick = foodTick;}
 	public double drinksTick() {return drinksTick;}
 	public void drinksTick(double drinksTick) {this.drinksTick = drinksTick;}
-	public void endTick(double endTick) {this.endTick = endTick;}
+	public void endTick(double endTick) {this.endTick = endTick;}	
+	public double endTick() {return endTick;}
 	@Override
 	public String toString() {return String.format("[%.2f]", arrivalTick);}
 }
@@ -57,8 +58,8 @@ final class CashiersDeparture extends Event{
 		System.out.println("CashiersDeparture at " + time + " client: " + client.id);
 
 		client.endTick(time);
-		model.hotFoodMaxDelayTime.add(client.waitCashierTime());
-		model.hotFoodMeanDelayTime.add(client.waitCashierTime());
+		model.cashierMeanDelayTime.add(client.waitCashierTime());
+		model.cashierMaxDelayTime.add(client.waitCashierTime());
 
 		if(model.cashiersQueue[cashier].value() > 0){
 			model.cashiersQueue[cashier].inc(-1, time);
