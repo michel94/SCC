@@ -59,7 +59,7 @@ final class CashiersDeparture extends Event{
 			System.out.println("Being serviced by CASHIER " + cashier + " at time " + (time + client.cashierTime()) );
 		}
 		else{
-			model.restCashiers[cashier].inc(-1, time);
+			model.restCashiers[cashier].inc(1, time);
 		}
 	}
 	
