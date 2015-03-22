@@ -94,7 +94,6 @@ final class DrinksDeparture extends Event{
 			model.cashiers[bestCashier].add(client);
 			System.out.println("On CASHIER queue " + bestCashier + " with size " + model.cashiersQueue[bestCashier].value() + " at time " + (time + client.cashierTime()) );
 		}
-		client.serviceTick(time);
 	}
 
 }
@@ -216,6 +215,14 @@ final class Stop extends Event {
 	@Override
 	public void execute() {
 		System.out.println("End");
+		System.out.println("Sandwiches max delay time: " + model.getHotFoodMaxDelayTime());
+		System.out.println("HotFood max delay time: " + model.getSandwichesMaxDelayTime());
+		System.out.println("Cashier max delay time: " + model.getCashierMaxDelayTime());
+
+		System.out.println("Sandwiches mean delay time: " + model.getHotFoodMeanDelayTime());
+		System.out.println("HotFood mean delay time: " + model.getSandwichesMeanDelayTime());
+		System.out.println("Cashier mean delay time: " + model.getCashierMeanDelayTime());
+
 		System.out.println("HotFood queue mean size: " + model.hotFoodQueue.mean(time));
 		model.clear();
 	}
@@ -271,4 +278,65 @@ final class Server extends Model {
 		schedule(new Stop(this), 1000);
 	}
 	
+	public double getSandwichesMaxDelayTime(){
+		double max = 0;
+		for(Token c : this.sandwiches){
+			if(c.waitTime() > max){
+				max = c.waitTime();
+			}
+		}
+		return max;
+	}
+
+	public double getHotFoodMaxDelayTime(){
+		double max = 0;
+		for(Token c : this.hotFood){
+			if(c.waitTime() > max){
+				max = c.waitTime();
+			}
+		}
+		return max;
+	}
+
+	public double getCashierMaxDelayTime(){
+		double max = 0;
+		for(Token c : this.sandwiches){
+			if(c.cashierTime() > max){
+				max = c.cashierTime();
+			}
+		}
+		for(Token c : this.hotFood){
+			if(c.cashierTime() > max){
+				max = c.cashierTime();
+			}
+		}
+		return max;
+	}
+
+	public double getSandwichesMeanDelayTime(){
+		double mean = 0;
+		for(Token c : this.sandwiches){
+			mean += c.waitTime();
+		}
+		return mean/this.sandwiches.size();
+	}
+
+	public double getHotFoodMeanDelayTime(){
+		double mean = 0;
+		for(Token c : this.hotFood){			
+			mean += c.waitTime();
+		}
+		return mean/this.hotFood.size();
+	}
+
+	public double getCashierMeanDelayTime(){
+		double mean = 0;
+		for(Token c : this.sandwiches){
+			mean += c.cashierTime();
+		}
+		for(Token c : this.hotFood){
+			mean += c.cashierTime();
+		}
+		return mean/(this.sandwiches.size()+this.hotFood.size());
+	}
 }
