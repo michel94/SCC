@@ -15,6 +15,7 @@ class Token {
 	private double drinksTick;
 	private double endTick;
 	private double cashierTime;
+	private double type;
 	public int id;
 	public Token(double arrivalTick) {
 		Random r = new Random();
@@ -39,6 +40,8 @@ class Token {
 	public void drinksTick(double drinksTick) {this.drinksTick = drinksTick;}
 	public void endTick(double endTick) {this.endTick = endTick;}
 	public double endTick() {return endTick;}
+	public void type(double type) {this.type = type;}
+	public double type() {return type;}
 	@Override
 	public String toString() {return String.format("[%.2f]", arrivalTick);}
 }
@@ -60,6 +63,23 @@ final class CashiersDeparture extends Event{
 		client.endTick(time);
 		model.cashierMeanDelayTime.add(client.waitCashierTime());
 		model.cashierMaxDelayTime.add(client.waitCashierTime());
+
+		if(client.type() == 0.0) //hotfood
+		{
+			model.clientAMeanDelayTime.add(client.waitCashierTime());
+			model.clientAMaxDelayTime.add(client.waitCashierTime());
+		}
+		else if(client.type() == 1.0)
+		{
+			model.clientBMeanDelayTime.add(client.waitCashierTime());
+			model.clientBMaxDelayTime.add(client.waitCashierTime());
+		}
+
+		else if(client.type() == 2.0)
+		{
+			model.clientCMeanDelayTime.add(client.waitCashierTime());
+			model.clientCMaxDelayTime.add(client.waitCashierTime());
+		}
 
 		model.overallMeanTime.add(client.cycleTime());
 
@@ -91,6 +111,7 @@ final class DrinksDeparture extends Event{
 
 		int bestCashier = 0;
 		client.drinksTick(time);
+
 		for(int i = 1; i < model.cashiers.length; i++){
 			if(model.cashiersQueue[i].value() < model.cashiersQueue[bestCashier].value())
 			bestCashier = i;
@@ -125,6 +146,9 @@ final class HotFoodDeparture extends Event{
 		model.hotFoodMaxDelayTime.add(client.waitFoodTime());
 		model.hotFoodMeanDelayTime.add(client.waitFoodTime());
 
+		model.clientAMeanDelayTime.add(client.waitFoodTime());
+		model.clientAMaxDelayTime.add(client.waitFoodTime());
+
 		client.addCashierTime(model.drinksExtraDist.next());
 		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 		System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
@@ -156,6 +180,9 @@ final class SandwichesDeparture extends Event{
 		client.foodTick(time);
 		model.sandwichesMaxDelaytime.add(client.waitFoodTime());
 		model.sandwichesMeanDelaytime.add(client.waitFoodTime());
+
+		model.clientBMeanDelayTime.add(client.waitFoodTime());
+		model.clientBMaxDelayTime.add(client.waitFoodTime());
 
 		client.addCashierTime(model.drinksExtraDist.next());
 		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
@@ -189,6 +216,7 @@ final class Arrival extends Event {
 
 		for(int i=0; i<g; i++){
 			q = model.choiceDist.next();
+			client.type(q);
 
 			if(q == 0.0){
 				//System.out.println("Arrival at " + q + " time " + time + " queue " + model.hotFoodQueue.value());
@@ -235,12 +263,12 @@ final class Stop extends Event {
 		System.out.println("End");
 
 		/* FIRST POINT STATISTICS */
-		System.out.println("1 - Sandwiches max delay time: " + model.sandwichesMaxDelaytime.value());
-		System.out.println("1 - HotFood max delay time: " + model.hotFoodMaxDelayTime.value());
-		System.out.println("1 - Cashier max delay time: " + model.cashierMaxDelayTime.value());
 		System.out.println("1 - Sandwiches mean delay time: " + model.sandwichesMeanDelaytime.mean());
 		System.out.println("1 - HotFood mean delay time: " + model.hotFoodMeanDelayTime.mean());
 		System.out.println("1 - Cashier mean delay time: " + model.cashierMeanDelayTime.mean());
+		System.out.println("1 - Sandwiches max delay time: " + model.sandwichesMaxDelaytime.value());
+		System.out.println("1 - HotFood max delay time: " + model.hotFoodMaxDelayTime.value());
+		System.out.println("1 - Cashier max delay time: " + model.cashierMaxDelayTime.value());
 
 		/* SECOND POINT STATISTICS */
 		System.out.println("2 - time-average sandwichesQueue: " + model.sandwichesQueue.mean(time));
@@ -263,7 +291,12 @@ final class Stop extends Event {
 		System.out.println("2 - max number cashiers: " + maxNumberCashier);
 
 		/* THIRD POINT STATISTICS */
-
+		System.out.println("3 - Client A mean delay time: " + model.clientAMeanDelayTime.mean());
+		System.out.println("3 - Client B mean delay time: " + model.clientBMeanDelayTime.mean());
+		System.out.println("3 - Client C mean delay time: " + model.clientCMeanDelayTime.mean());
+		System.out.println("3 - Client A max delay time: " + model.clientAMaxDelayTime.value());
+		System.out.println("3 - Client B max delay time: " + model.clientBMaxDelayTime.value());
+		System.out.println("3 - Client C max delay time: " + model.clientCMaxDelayTime.value());
 		/* FORTH POINT STATISTICS */
 
 		/* FIFTH POINT STATISTICS */
@@ -276,8 +309,8 @@ final class Stop extends Event {
 final class Server extends Model {
 	final Accumulate hotFoodQueue, sandwichesQueue;
 	final Accumulate restSandwiches, restHotFood;
-	public final Average sandwichesMeanDelaytime, hotFoodMeanDelayTime, cashierMeanDelayTime, overallMeanTime;
-	public final Max sandwichesMaxDelaytime, hotFoodMaxDelayTime, cashierMaxDelayTime;
+	public final Average sandwichesMeanDelaytime, hotFoodMeanDelayTime, cashierMeanDelayTime, clientAMeanDelayTime, clientBMeanDelayTime, clientCMeanDelayTime, overallMeanTime;
+	public final Max sandwichesMaxDelaytime, hotFoodMaxDelayTime, cashierMaxDelayTime, clientAMaxDelayTime, clientBMaxDelayTime, clientCMaxDelayTime;
 	public final List<Token> sandwiches, hotFood;
 	public final ArrayList<Token>[] cashiers;
 	public final Accumulate[] cashiersQueue, restCashiers;
@@ -302,11 +335,17 @@ final class Server extends Model {
 		sandwichesMeanDelaytime = new Average();
 		hotFoodMeanDelayTime = new Average();
 		cashierMeanDelayTime = new Average();
+		clientAMeanDelayTime = new Average();
+		clientBMeanDelayTime = new Average();
+		clientCMeanDelayTime = new Average();
 		overallMeanTime = new Average();
 
 		sandwichesMaxDelaytime = new Max();
 		hotFoodMaxDelayTime = new Max();
 		cashierMaxDelayTime = new Max();
+		clientAMaxDelayTime = new Max();
+		clientBMaxDelayTime = new Max();
+		clientCMaxDelayTime = new Max();
 
 		sandwiches = new ArrayList<>();
 		hotFood = new ArrayList<>();
