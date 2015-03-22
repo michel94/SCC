@@ -299,8 +299,8 @@ final class Stop extends Event {
 		System.out.println("3 - Client C max delay time: " + model.clientCMaxDelayTime.value());
 
 		/* FORTH POINT STATISTICS */
-		System.out.println("4 - Overall mean delay time (weighted): " + (model.clientAMeanDelayTime.mean()*0.8 + model.clientBMeanDelayTime.mean()*0.15) + model.clientCMeanDelayTime.mean()*0.05);
-		System.out.println("4 - Overall max delay time (weighted): " + (model.clientAMaxDelayTime.value()*0.8 + model.clientBMaxDelayTime.value()*0.15) + model.clientCMaxDelayTime.value()*0.05);
+		System.out.println("4 - Overall mean delay time (weighted): " + (model.clientAMeanDelayTime.mean()*0.8 + model.clientBMeanDelayTime.mean()*0.15 + model.clientCMeanDelayTime.mean()*0.05));
+		System.out.println("4 - Overall max delay time (weighted): " + (model.clientAMaxDelayTime.value()*0.8 + model.clientBMaxDelayTime.value()*0.15 + model.clientCMaxDelayTime.value()*0.05));
 
 		/* FIFTH POINT STATISTICS */
 		System.out.println("5 - Mean time per user: " + model.overallMeanTime.mean());
