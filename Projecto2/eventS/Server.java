@@ -11,14 +11,15 @@ import java.util.*;
 
 class Token {
 	private double arrivalTick;
-	private double serviceTick;
+	private double foodTick;
+	private double drinksTick;
 	private double endTick;
 	private double cashierTime;
 	public int id;
 	public Token(double arrivalTick) {
 		Random r = new Random();
 		id = Math.abs(r.nextInt() % 1000);
-		this.arrivalTick = this.serviceTick = arrivalTick;
+		this.arrivalTick = this.foodTick = arrivalTick;
 	}
 	public void addCashierTime(double t){
 		cashierTime += t;
@@ -26,13 +27,16 @@ class Token {
 	public double cashierTime(){
 		return cashierTime;
 	}
-	public double waitTime() {return serviceTick - arrivalTick;}
+	public double waitFoodTime() {return foodTick - arrivalTick;}
+	public double waitCashierTime() {return endTick - drinksTick;}
 	public double cycleTime(double time) {return time - arrivalTick;}
 	public double cycleTime() {return endTick - arrivalTick;}
 	public void arrivalTick(double arrivalTick) {this.arrivalTick = arrivalTick;}
 	public double arrivalTick() {return arrivalTick;}
-	public double serviceTick() {return serviceTick;}
-	public void serviceTick(double serviceTick) {this.serviceTick = serviceTick;}
+	public double foodTick() {return foodTick;}
+	public void foodTick(double foodTick) {this.foodTick = foodTick;}
+	public double drinksTick() {return drinksTick;}
+	public void drinksTick(double drinksTick) {this.drinksTick = drinksTick;}
 	public void endTick(double endTick) {this.endTick = endTick;}
 	@Override
 	public String toString() {return String.format("[%.2f]", arrivalTick);}
@@ -51,6 +55,10 @@ final class CashiersDeparture extends Event{
 	@Override
 	public void execute(){
 		System.out.println("CashiersDeparture at " + time + " client: " + client.id);
+
+		client.endTick(time);
+		model.hotFoodMaxDelayTime.add(client.waitCashierTime());
+		model.hotFoodMeanDelayTime.add(client.waitCashierTime());
 
 		if(model.cashiersQueue[cashier].value() > 0){
 			model.cashiersQueue[cashier].inc(-1, time);
@@ -79,6 +87,7 @@ final class DrinksDeparture extends Event{
 		System.out.println("Accumulated Time " + client.cashierTime());
 
 		int bestCashier = 0;
+		client.drinksTick(time);
 		for(int i = 1; i < model.cashiers.length; i++){
 			if(model.cashiersQueue[i].value() < model.cashiersQueue[bestCashier].value())
 			bestCashier = i;
@@ -109,7 +118,10 @@ final class HotFoodDeparture extends Event{
 	@Override
 	public void execute() {
 
-		client.serviceTick(time);
+		client.foodTick(time);
+		model.hotFoodMaxDelayTime.add(client.waitFoodTime());
+		model.hotFoodMeanDelayTime.add(client.waitFoodTime());
+
 		client.addCashierTime(model.drinksExtraDist.next());
 		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 		System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
@@ -138,7 +150,10 @@ final class SandwichesDeparture extends Event{
 	@Override
 	public void execute() {
 
-		client.serviceTick(time);
+		client.foodTick(time);
+		model.sandwichesMaxDelaytime.add(client.waitFoodTime());
+		model.sandwichesMeanDelaytime.add(client.waitFoodTime());
+
 		client.addCashierTime(model.drinksExtraDist.next());
 		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 		System.out.println("Sandwich Departure " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
@@ -215,13 +230,13 @@ final class Stop extends Event {
 	@Override
 	public void execute() {
 		System.out.println("End");
-		System.out.println("Sandwiches max delay time: " + model.getHotFoodMaxDelayTime());
-		System.out.println("HotFood max delay time: " + model.getSandwichesMaxDelayTime());
-		System.out.println("Cashier max delay time: " + model.getCashierMaxDelayTime());
+		System.out.println("Sandwiches max delay time: " + model.sandwichesMaxDelaytime.value());
+		System.out.println("HotFood max delay time: " + model.hotFoodMaxDelayTime.value());
+		System.out.println("Cashier max delay time: " + model.cashierMaxDelayTime.value());
 
-		System.out.println("Sandwiches mean delay time: " + model.getHotFoodMeanDelayTime());
-		System.out.println("HotFood mean delay time: " + model.getSandwichesMeanDelayTime());
-		System.out.println("Cashier mean delay time: " + model.getCashierMeanDelayTime());
+		System.out.println("Sandwiches mean delay time: " + model.sandwichesMeanDelaytime.mean());
+		System.out.println("HotFood mean delay time: " + model.hotFoodMeanDelayTime.mean());
+		System.out.println("Cashier mean delay time: " + model.cashierMeanDelayTime.mean());
 
 		System.out.println("HotFood queue mean size: " + model.hotFoodQueue.mean(time));
 		model.clear();
@@ -231,6 +246,8 @@ final class Stop extends Event {
 final class Server extends Model {
 	final Accumulate hotFoodQueue, sandwichesQueue;
 	final Accumulate restSandwiches, restHotFood;
+	public final Average sandwichesMeanDelaytime, hotFoodMeanDelayTime, cashierMeanDelayTime;
+	public final Max sandwichesMaxDelaytime, hotFoodMaxDelayTime, cashierMaxDelayTime;
 	public final List<Token> sandwiches, hotFood;
 	public final ArrayList<Token>[] cashiers;
 	public final Accumulate[] cashiersQueue, restCashiers;
@@ -251,6 +268,14 @@ final class Server extends Model {
 		restCashiers = new Accumulate[2];
 		for(int i = 0; i < restCashiers.length; i++)
 			restCashiers[i] = new Accumulate(1);
+
+		sandwichesMeanDelaytime = new Average();
+		hotFoodMeanDelayTime = new Average();
+		cashierMeanDelayTime = new Average();
+
+		sandwichesMaxDelaytime = new Max();
+		hotFoodMaxDelayTime = new Max();
+		cashierMaxDelayTime = new Max();
 
 		sandwiches = new ArrayList<>();
 		hotFood = new ArrayList<>();
@@ -276,67 +301,5 @@ final class Server extends Model {
 	protected void init() {
 		schedule(new Arrival(this), arrivalDist.next());
 		schedule(new Stop(this), 1000);
-	}
-	
-	public double getSandwichesMaxDelayTime(){
-		double max = 0;
-		for(Token c : this.sandwiches){
-			if(c.waitTime() > max){
-				max = c.waitTime();
-			}
-		}
-		return max;
-	}
-
-	public double getHotFoodMaxDelayTime(){
-		double max = 0;
-		for(Token c : this.hotFood){
-			if(c.waitTime() > max){
-				max = c.waitTime();
-			}
-		}
-		return max;
-	}
-
-	public double getCashierMaxDelayTime(){
-		double max = 0;
-		for(Token c : this.sandwiches){
-			if(c.cashierTime() > max){
-				max = c.cashierTime();
-			}
-		}
-		for(Token c : this.hotFood){
-			if(c.cashierTime() > max){
-				max = c.cashierTime();
-			}
-		}
-		return max;
-	}
-
-	public double getSandwichesMeanDelayTime(){
-		double mean = 0;
-		for(Token c : this.sandwiches){
-			mean += c.waitTime();
-		}
-		return mean/this.sandwiches.size();
-	}
-
-	public double getHotFoodMeanDelayTime(){
-		double mean = 0;
-		for(Token c : this.hotFood){			
-			mean += c.waitTime();
-		}
-		return mean/this.hotFood.size();
-	}
-
-	public double getCashierMeanDelayTime(){
-		double mean = 0;
-		for(Token c : this.sandwiches){
-			mean += c.cashierTime();
-		}
-		for(Token c : this.hotFood){
-			mean += c.cashierTime();
-		}
-		return mean/(this.sandwiches.size()+this.hotFood.size());
 	}
 }

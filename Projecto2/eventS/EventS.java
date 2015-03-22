@@ -124,6 +124,23 @@ class Average {
 	public String toString() {return String.format("%.3f\t%d", mean(), count);}
 }
 
+class Max {
+	private double value;
+	public Max() {clear();}
+	public double value() {return value;}
+	public void add(double value) {
+		if (this.value < value)
+		{
+			this.value = value;
+		}
+	}
+	public final void clear() {
+		value = 0.0;
+	}
+	@Override
+	public String toString() {return String.format("%.3f", value());}
+}
+
 class Tally {
 	final private List<Double> values;
 	public Tally() {values = new ArrayList<>();}
