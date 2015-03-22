@@ -219,8 +219,8 @@ final class Stop extends Event {
 }
 
 final class Server extends Model {
-	final Accumulate hotFoodQueue, sandwichesQueue, queue;
-	final Accumulate restSandwiches, restHotFood, rest;
+	final Accumulate hotFoodQueue, sandwichesQueue;
+	final Accumulate restSandwiches, restHotFood;
 	public final List<Token> sandwiches, hotFood;
 	public final ArrayList<Token>[] cashiers;
 	public final Accumulate[] cashiersQueue, restCashiers;
@@ -230,15 +230,11 @@ final class Server extends Model {
 	public Server(int n) {
 		super();
 
-		this.queue = new Accumulate(0);
-		this.rest = new Accumulate(n);
-
 		hotFoodQueue = new Accumulate(0);
 		sandwichesQueue = new Accumulate(0);
 		cashiersQueue = new Accumulate[3];
 		for(int i = 0; i < cashiersQueue.length; i++)
 			cashiersQueue[i] = new Accumulate(0);
-
 
 		restSandwiches = new Accumulate(1);
 		restHotFood = new Accumulate(1);
@@ -271,6 +267,5 @@ final class Server extends Model {
 		schedule(new Arrival(this), arrivalDist.next());
 		schedule(new Stop(this), 1000);
 	}
-	@Override
-	public String toString() {return "" + queue.value() + " " + rest.value();}
+	
 }
