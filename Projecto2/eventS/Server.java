@@ -52,8 +52,8 @@ final class CashiersDepartue extends Event{
 	public void execute(){
 		System.out.println("CashiersDepartue at " + time + " client: " + client.id);
 
-		if(model.restCashiers[cashier].value() > 0){
-			model.restCashiers[cashier].inc(-1, time);
+		if(model.cashiersQueue[cashier].value() > 0){
+			model.cashiersQueue[cashier].inc(-1, time);
 			client = model.cashiers[cashier].remove(0);
 			model.schedule(this, client.cashierTime());
 		}
@@ -74,23 +74,25 @@ final class DrinksDeparture extends Event{
 	@Override
 	public void execute() {
 		System.out.println("DrinksDeparture at " + time + " client: " + client.id);
-		System.out.println("Accumulated Time " + client.cashierTime());
+		//System.out.println("Accumulated Time " + client.cashierTime());
+		//client.serviceTick(time);
 
 		int bestCashier = 0;
 		for(int i = 1; i < model.cashiers.length; i++){
 			if(model.cashiersQueue[i].value() < model.cashiersQueue[bestCashier].value())
-			bestCashier = i;
+				bestCashier = i;
 		}
 
 		if(model.restCashiers[bestCashier].value() > 0){
 			model.restCashiers[bestCashier].inc(-1, time);
-			model.schedule(new CashiersDepartue(model, client, bestCashier), /*time +*/ client.cashierTime());
+
+			model.schedule(new CashiersDepartue(model, client, bestCashier), client.cashierTime());
 		}
 		else{
+			System.out.println("QUEUE " + bestCashier + ": " + model.restCashiers[bestCashier].value());
 			model.cashiersQueue[bestCashier].inc(1, time);
 			model.cashiers[bestCashier].add(client);
 		}
-		client.serviceTick(time);
 	}
 }
 
@@ -108,7 +110,7 @@ final class HotFoodDeparture extends Event{
 		client.serviceTick(time);
 		client.addCashierTime(model.drinksExtraDist.next());
 		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
-		System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
+		System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value());
 
 		if (model.hotFoodQueue.value() > 0) {
 			model.hotFoodQueue.inc(-1, time);
