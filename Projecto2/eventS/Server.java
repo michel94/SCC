@@ -37,7 +37,7 @@ class Token {
 	public void foodTick(double foodTick) {this.foodTick = foodTick;}
 	public double drinksTick() {return drinksTick;}
 	public void drinksTick(double drinksTick) {this.drinksTick = drinksTick;}
-	public void endTick(double endTick) {this.endTick = endTick;}	
+	public void endTick(double endTick) {this.endTick = endTick;}
 	public double endTick() {return endTick;}
 	@Override
 	public String toString() {return String.format("[%.2f]", arrivalTick);}
@@ -73,7 +73,7 @@ final class CashiersDeparture extends Event{
 			model.restCashiers[cashier].inc(1, time);
 		}
 	}
-	
+
 }
 
 final class DrinksDeparture extends Event{
@@ -95,7 +95,7 @@ final class DrinksDeparture extends Event{
 			if(model.cashiersQueue[i].value() < model.cashiersQueue[bestCashier].value())
 			bestCashier = i;
 		}
-		
+
 		if(model.restCashiers[bestCashier].value() > 0){
 			model.restCashiers[bestCashier].inc(-1, time);
 			model.schedule(new CashiersDeparture(model, client, bestCashier), /*time +*/ client.cashierTime());
@@ -263,13 +263,13 @@ final class Server extends Model {
 
 		hotFoodQueue = new Accumulate(0);
 		sandwichesQueue = new Accumulate(0);
-		cashiersQueue = new Accumulate[2];
+		cashiersQueue = new Accumulate[2+cs];
 		for(int i = 0; i < cashiersQueue.length; i++)
 			cashiersQueue[i] = new Accumulate(0);
 
 		restSandwiches = new Accumulate(1);
 		restHotFood = new Accumulate(1);
-		restCashiers = new Accumulate[2];
+		restCashiers = new Accumulate[2+cs];
 		for(int i = 0; i < restCashiers.length; i++)
 			restCashiers[i] = new Accumulate(1);
 
