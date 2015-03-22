@@ -230,7 +230,7 @@ final class Server extends Model {
 	final Uniform hotFoodDist, sandwichesDist, drinksDist, hotFoodExtraDist, sandwichesExtraDist, drinksExtraDist;
 	final Discrete choiceDist, groupsDist;
 	final Exponential arrivalDist;
-	public Server(int n) {
+	public Server(int hf, int sd, int cs) {
 		super();
 
 		hotFoodQueue = new Accumulate(0);
@@ -247,13 +247,13 @@ final class Server extends Model {
 
 		sandwiches = new ArrayList<>();
 		hotFood = new ArrayList<>();
-		cashiers = new ArrayList[2];
+		cashiers = new ArrayList[2+cs];
 		for(int i = 0; i < cashiers.length; i++)
 			cashiers[i] = new ArrayList<Token>();
 
 		arrivalDist = new Exponential((int)new Date().getTime(), 30.0);
-		hotFoodDist = new Uniform((int)new Date().getTime(), 50.0, 120.0);
-		sandwichesDist = new Uniform((int)new Date().getTime(), 60.0, 180.0);
+		hotFoodDist = new Uniform((int)new Date().getTime(), 50.0/hf, 120.0/hf);
+		sandwichesDist = new Uniform((int)new Date().getTime(), 60.0/sd, 180.0/sd);
 		drinksDist = new Uniform((int)new Date().getTime(), 5.0, 20.0);
 
 		hotFoodExtraDist = new Uniform((int)new Date().getTime(), 20.0, 40.0);

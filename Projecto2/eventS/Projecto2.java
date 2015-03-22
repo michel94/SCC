@@ -4,7 +4,7 @@ import eventS.*;
 
 public class Projecto2{
 	public Projecto2(){
-		Model model = new Server(1);
+		Model model = new Server(1, 1, 0);
 		Simulator simulator = new Simulator(model);
 		model.simulator(simulator);
 		simulator.run();
