@@ -58,7 +58,7 @@ final class CashiersDeparture extends Event{
 	}
 	@Override
 	public void execute(){
-		System.out.println("CashiersDeparture at " + time + " client: " + client.id);
+		//System.out.println("CashiersDeparture at " + time + " client: " + client.id);
 
 		client.endTick(time);
 		model.cashierMeanDelayTime.add(client.waitCashierTime());
@@ -87,7 +87,7 @@ final class CashiersDeparture extends Event{
 			model.cashiersQueue[cashier].inc(-1, time);
 			client = model.cashiers[cashier].remove(0);
 			model.schedule(this, client.cashierTime());
-			System.out.println("Being serviced by CASHIER " + cashier + " at time " + (time + client.cashierTime()) );
+			//System.out.println("Being serviced by CASHIER " + cashier + " at time " + (time + client.cashierTime()) );
 		}
 		else{
 			model.restCashiers[cashier].inc(1, time);
@@ -106,8 +106,8 @@ final class DrinksDeparture extends Event{
 	}
 	@Override
 	public void execute() {
-		System.out.println("DrinksDeparture at " + time + " client: " + client.id);
-		System.out.println("Accumulated Time " + client.cashierTime());
+		//System.out.println("DrinksDeparture at " + time + " client: " + client.id);
+		//System.out.println("Accumulated Time " + client.cashierTime());
 
 		int bestCashier = 0;
 		client.drinksTick(time);
@@ -120,12 +120,12 @@ final class DrinksDeparture extends Event{
 		if(model.restCashiers[bestCashier].value() > 0){
 			model.restCashiers[bestCashier].inc(-1, time);
 			model.schedule(new CashiersDeparture(model, client, bestCashier), /*time +*/ client.cashierTime());
-			System.out.println("Being serviced by CASHIER " + bestCashier + " at time " + (time + client.cashierTime()) + " queue size " + model.cashiersQueue[bestCashier].value() );
+			//System.out.println("Being serviced by CASHIER " + bestCashier + " at time " + (time + client.cashierTime()) + " queue size " + model.cashiersQueue[bestCashier].value() );
 		}
 		else{
 			model.cashiersQueue[bestCashier].inc(1, time);
 			model.cashiers[bestCashier].add(client);
-			System.out.println("On CASHIER queue " + bestCashier + " with size " + model.cashiersQueue[bestCashier].value() + " at time " + (time + client.cashierTime()) );
+			//System.out.println("On CASHIER queue " + bestCashier + " with size " + model.cashiersQueue[bestCashier].value() + " at time " + (time + client.cashierTime()) );
 		}
 	}
 
@@ -151,7 +151,7 @@ final class HotFoodDeparture extends Event{
 
 		client.addCashierTime(model.drinksExtraDist.next());
 		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
-		System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
+		//System.out.println("HotFoodDeparture at " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 
 		if (model.hotFoodQueue.value() > 0) {
 			model.hotFoodQueue.inc(-1, time);
@@ -186,7 +186,7 @@ final class SandwichesDeparture extends Event{
 
 		client.addCashierTime(model.drinksExtraDist.next());
 		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
-		System.out.println("Sandwich Departure " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
+		//System.out.println("Sandwich Departure " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
 
 		if (model.sandwichesQueue.value() > 0) {
 			model.sandwichesQueue.inc(-1, time);
@@ -212,7 +212,7 @@ final class Arrival extends Event {
 		Token client = new Token(time);
 
 		double q, g = model.groupsDist.next();
-		System.out.println("Group with " + g + " elements");
+		//System.out.println("Group with " + g + " elements");
 
 		for(int i=0; i<g; i++){
 			q = model.choiceDist.next();
@@ -260,7 +260,7 @@ final class Stop extends Event {
 	}
 	@Override
 	public void execute() {
-		System.out.println("End");
+		System.out.println("STATISTICS");
 
 		/* FIRST POINT STATISTICS */
 		System.out.println("1 - Sandwiches mean delay time: " + model.sandwichesMeanDelaytime.mean());
