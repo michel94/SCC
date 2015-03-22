@@ -38,6 +38,31 @@ class Token {
 	public String toString() {return String.format("[%.2f]", arrivalTick);}
 }
 
+final class CashiersDepartue extends Event{
+	private Token client;
+	private Server model;
+	private int cashier;
+	public CashiersDepartue(Server model, Token client, int cashier){
+		super();
+		this.model = model;
+		this.client = client;
+		this.cashier = cashier;
+	}
+	@Override
+	public void execute(){
+		System.out.println("CashiersDepartue at " + time + " client: " + client.id);
+
+		if(model.restCashiers[cashier].value() > 0){
+			model.restCashiers[cashier].inc(-1, time);
+			client = model.cashiers[cashier].remove(0);
+			model.schedule(this, client.cashierTime());
+		}
+		else{
+			model.restCashiers[cashier].inc(-1, time);
+		}
+	}
+}
+
 final class DrinksDeparture extends Event{
 	private Token client;
 	private Server model;
@@ -50,8 +75,22 @@ final class DrinksDeparture extends Event{
 	public void execute() {
 		System.out.println("DrinksDeparture at " + time + " client: " + client.id);
 		System.out.println("Accumulated Time " + client.cashierTime());
-		client.serviceTick(time);
 
+		int bestCashier = 0;
+		for(int i = 1; i < model.cashiers.length; i++){
+			if(model.cashiersQueue[i].value() < model.cashiersQueue[bestCashier].value())
+			bestCashier = i;
+		}
+
+		if(model.restCashiers[bestCashier].value() > 0){
+			model.restCashiers[bestCashier].inc(-1, time);
+			model.schedule(new CashiersDepartue(model, client, bestCashier), /*time +*/ client.cashierTime());
+		}
+		else{
+			model.cashiersQueue[bestCashier].inc(1, time);
+			model.cashiers[bestCashier].add(client);
+		}
+		client.serviceTick(time);
 	}
 }
 
@@ -65,7 +104,7 @@ final class HotFoodDeparture extends Event{
 	}
 	@Override
 	public void execute() {
-		
+
 		client.serviceTick(time);
 		client.addCashierTime(model.drinksExtraDist.next());
 		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
@@ -80,7 +119,7 @@ final class HotFoodDeparture extends Event{
 		else {
 			model.restHotFood.inc(-1, time);
 		}
-		
+
 	}
 }
 
@@ -99,7 +138,7 @@ final class SandwichesDeparture extends Event{
 		client.addCashierTime(model.drinksExtraDist.next());
 		model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 		System.out.println("Sandwich Departure " + time + " client: " + client.id + " queue size " + model.hotFoodQueue.value() );
-		
+
 		if (model.sandwichesQueue.value() > 0) {
 			model.sandwichesQueue.inc(-1, time);
 			client = model.sandwiches.remove(0);
@@ -109,7 +148,7 @@ final class SandwichesDeparture extends Event{
 		else {
 			model.restSandwiches.inc(-1, time);
 		}
-		
+
 	}
 }
 
@@ -122,13 +161,13 @@ final class Arrival extends Event {
 	@Override
 	public void execute() {
 		Token client = new Token(time);
-		
-		double q, g = model.groupsDist.next(); 
+
+		double q, g = model.groupsDist.next();
 		System.out.println("Group with " + g + " elements");
-		
+
 		for(int i=0; i<g; i++){
 			q = model.choiceDist.next();
-			
+
 			if(q == 0.0){
 				System.out.println("Arrival at " + q + " time " + time + " queue " + model.hotFoodQueue.value());
 				if(model.restHotFood.value() > 0){ // hotfood not working
@@ -155,7 +194,7 @@ final class Arrival extends Event {
 				client.addCashierTime(model.drinksExtraDist.next());
 				model.schedule(new DrinksDeparture(model, client), model.drinksDist.next());
 			}
-			
+
 		}
 		model.schedule(this, model.arrivalDist.next());
 
@@ -181,25 +220,36 @@ final class Server extends Model {
 	final Accumulate hotFoodQueue, sandwichesQueue, queue;
 	final Accumulate restSandwiches, restHotFood, rest;
 	public final List<Token> sandwiches, hotFood;
-	public final List<Token>[] cashiers;
+	public final ArrayList<Token>[] cashiers;
+	public final Accumulate[] cashiersQueue, restCashiers;
 	final Uniform hotFoodDist, sandwichesDist, drinksDist, hotFoodExtraDist, sandwichesExtraDist, drinksExtraDist;
 	final Discrete choiceDist, groupsDist;
 	final Exponential arrivalDist;
 	public Server(int n) {
 		super();
 
+		this.queue = new Accumulate(0);
+		this.rest = new Accumulate(n);
+
 		hotFoodQueue = new Accumulate(0);
 		sandwichesQueue = new Accumulate(0);
-		this.queue = new Accumulate(0);
+		cashiersQueue = new Accumulate[3];
+		for(int i = 0; i < cashiersQueue.length; i++)
+			cashiersQueue[i] = new Accumulate(0);
 
-		this.rest = new Accumulate(n);
+
 		restSandwiches = new Accumulate(1);
 		restHotFood = new Accumulate(1);
+		restCashiers = new Accumulate[3];
+		for(int i = 0; i < restCashiers.length; i++)
+			restCashiers[i] = new Accumulate(1);
 
 		sandwiches = new ArrayList<>();
 		hotFood = new ArrayList<>();
-		cashiers = new ArrayList[3]; //TODO: fix this warning
-		
+		cashiers = new ArrayList[3];
+		for(int i = 0; i < cashiers.length; i++)
+			cashiers[i] = new ArrayList<Token>();
+
 		arrivalDist = new Exponential((int)new Date().getTime(), 30.0);
 		hotFoodDist = new Uniform((int)new Date().getTime(), 50.0, 120.0);
 		sandwichesDist = new Uniform((int)new Date().getTime(), 60.0, 180.0);
@@ -222,7 +272,3 @@ final class Server extends Model {
 	@Override
 	public String toString() {return "" + queue.value() + " " + rest.value();}
 }
-
-
-
-

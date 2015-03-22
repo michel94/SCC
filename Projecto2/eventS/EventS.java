@@ -19,7 +19,7 @@ class Discrete extends Uniform01 {
 		super(stream);
 		double sum = 0.0;
 		for (int i = 0; i < prob.length; ++i) sum += prob[i];
-		assert(sum <= 1.0); 
+		assert(sum <= 1.0);
 		this.prob = prob;
 		this.values = values;
 	}
@@ -235,4 +235,3 @@ final class Simulator {
 		}
 	}
 }
-
