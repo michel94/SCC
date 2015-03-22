@@ -84,7 +84,7 @@ class Exponential extends Uniform01 {
 
 class Accumulate {
 	private int value = 0;
-	private double max = 0.0;
+	private int max = 0;
 	private double accum = 0.0;
 	private double last = 0.0;
 	public Accumulate(int value) {this.value = value;}
@@ -93,6 +93,8 @@ class Accumulate {
 		double delta = time - last;
 		accum += value * delta;
 		this.value = v;
+		if(this.value > max)
+			max = this.value
 		last = time;
 	}
 	public double mean(double time) {return integral(time) / time;}
@@ -101,10 +103,6 @@ class Accumulate {
 		accum += value * delta;
 		last = time;
 		return accum;
-	}
-	public void max(double v){
-		if (v > max)
-			max = v;
 	}
 	public double max(){
 		return max;
