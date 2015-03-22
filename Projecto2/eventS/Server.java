@@ -373,6 +373,6 @@ final class Server extends Model {
 	@Override
 	protected void init() {
 		schedule(new Arrival(this), arrivalDist.next());
-		schedule(new Stop(this), 1000);
+		schedule(new Stop(this), 9000);
 	}
 }
