@@ -1,0 +1,1 @@
+javac -cp lib/desmoj.jar src/*.java -Xlint:unchecked
