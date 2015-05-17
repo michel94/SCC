@@ -17,11 +17,12 @@ public class IOStation extends SimProcess{
 	public void lifeCycle(){
 		
 		while(true){
-			Truck truck = new Truck(model);
-			truck.activate(new TimeSpan(0));
 
-			Double t = model.newTruckDistTime();
-			System.out.println("New truck " + t);
+			Job job = new Job(model);
+			job.activate(new TimeSpan(0));
+
+			Double t = model.newJobDistTime();
+			System.out.println("New Job " + t);
 			hold(new TimeSpan(t, TimeUnit.MINUTES));
 			
 		}
