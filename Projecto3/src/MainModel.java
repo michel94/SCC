@@ -2,7 +2,8 @@ import desmoj.core.simulator.*;
 import desmoj.core.dist.*;
 
 public class MainModel extends Model {
-	private ContDistExponential newTruckDist;
+	private ContDistExponential newJobDist;
+	private AVG avg;
 
 	public MainModel(){
 		super(null, "Main", true, true);
@@ -13,15 +14,21 @@ public class MainModel extends Model {
 		return "";
 	}
 	public void init(){
-		newTruckDist = new ContDistExponential(this, "newTruckDist", 15, true, false);
-		newTruckDist.setNonNegative(true);
+		newJobDist = new ContDistExponential(this, "newJobDist", 15, true, false);
+		newJobDist.setNonNegative(true);
 	}
 	public void doInitialSchedules() {
 		IOStation ioStation = new IOStation(this);
 		ioStation.activate(new TimeSpan(0));
+
+		avg = new AVG(this);
+		avg.activate(new TimeSpan(0));
 		
 	}
-	public Double newTruckDistTime(){
-		return newTruckDist.sample();
+	public AVG getAvg(){
+		return avg;
+	}
+	public Double newJobDistTime(){
+		return newJobDist.sample();
 	}
 }
