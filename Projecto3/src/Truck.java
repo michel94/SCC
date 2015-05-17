@@ -1,13 +1,13 @@
 import desmoj.core.simulator.*;
-
+import desmoj.core.dist.*;
 
 public class Truck extends SimProcess {
-	Model mainModel;
+	Model model;
 
 	public Truck(Model model) {
 		super(model, "Truck", true);
 
-		mainModel = model;
+		this.model = model;
 	}
 
 	public void lifeCycle(){
@@ -15,6 +15,7 @@ public class Truck extends SimProcess {
 	}
 
 	public void init() {
+		
 
 	}
 }
