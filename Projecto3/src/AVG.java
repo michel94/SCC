@@ -1,16 +1,17 @@
 import desmoj.core.simulator.*;
 import desmoj.core.dist.*;
+import java.util.concurrent.*;
 
 public class AVG extends SimProcess {
 	Model model;
 	ProcessQueue<Job> avgQueue;
 	int currentPos = 0;
-	int[][] distances ={{0  ,45 ,50,90 ,100,135},
-						{45 ,0  ,50,100,90 ,135},
-						{50 ,50 ,0 ,50 ,50 ,90 },
-						{90 ,100,50,0  ,45 ,50 },
-						{100,90 ,50,45 ,0  ,50 },
-						{135,135,90,50 ,50 , 0 }};
+	int[][] distances ={{0, 135,135,90,50 ,50, 0},
+						{135, 0  ,45 ,50,90 ,100},
+						{135, 45 ,0  ,50,100,90 },
+						{90, 50 ,50 ,0 ,50 ,50 },
+						{50, 90 ,100,50,0  ,45 },
+						{50, 100,90 ,50,45 ,0  }};
 
 	public AVG(Model model) {
 		super(model, "Truck", true);
@@ -18,7 +19,7 @@ public class AVG extends SimProcess {
 	}
 
 	public void init() {
-		avgQueue = new ProcessQueue<Job>(this, "AVG Queue", true, true);
+		avgQueue = new ProcessQueue<Job>(model, "AVG Queue", true, true);
 	}
 
 	private void moveTo(int end){
