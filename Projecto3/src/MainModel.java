@@ -4,6 +4,10 @@ import desmoj.core.dist.*;
 public class MainModel extends Model {
 	private ContDistExponential newJobDist;
 	private AVG avg;
+	double[][] meanServiceTimes = {{30, 36, 51, 30}, {66, 48, 45}, {72, 15, 42, 54, 60}};
+	ContDistErlang[][] serviceTimesDist;
+	Station[] stations;
+
 
 	public MainModel(){
 		super(null, "Main", true, true);
@@ -16,6 +20,15 @@ public class MainModel extends Model {
 	public void init(){
 		newJobDist = new ContDistExponential(this, "newJobDist", 15, true, false);
 		newJobDist.setNonNegative(true);
+
+		serviceTimesDist = new ContDistErlang[4][5];
+		for(int t = 0; t<meanServiceTimes.length; t++)
+			for(int i = 0; i<meanServiceTimes[t].length; i++)
+				serviceTimesDist[t][i] = new ContDistErlang(this, "serviceTimesDist " + t + ", " + i, 1, meanServiceTimes[t][i], false, false);
+
+		stations = new Station[5];
+		for(int i=0; i<stations.length; i++)
+			stations[i] = new Station(this, "station " + i, meanServiceTimes[i].length);
 	}
 	public void doInitialSchedules() {
 		IOStation ioStation = new IOStation(this);
@@ -30,5 +43,12 @@ public class MainModel extends Model {
 	}
 	public Double newJobDistTime(){
 		return newJobDist.sample();
+	}
+
+	public double getServiceTime(int jobType, int curStage){
+		return serviceTimesDist[jobType][curStage].sample();
+	}
+	public Station getStation(int n){
+		return stations[n];
 	}
 }

@@ -2,30 +2,37 @@ import desmoj.core.simulator.*;
 import desmoj.core.dist.*;
 import java.util.concurrent.*;
 
-public class Station extends SimProcess{
-    MainModel model;
+public class Station{
+	MainModel model;
+	ProcessQueue<Job> queue;
+	String name;
+	Machine[] machines;
 
-    public IOStation(MainModel model, String name){
-        super(model, name, true);
-        this.model = model;
-    }
-    public void init(){
+	public Station(MainModel model, String name, int nMachines){
+		this.model = model;
+		this.name = name;
+		machines = new Machine[nMachines];
+		for(int i=0; i<nMachines; i++)
+			machines[i] = new Machine(model, this);
+		
+		System.out.println("Station");
+		queue = new ProcessQueue<Job>(model, name + " Queue", true, true);
+	}
+	
+	public Job popFromQueue(){
+		Job job = queue.first();
+		queue.remove(job);
+		return job;
+	}
 
-        System.out.println("IOStation");
+	public void pushToQueue(Job job){
+		queue.insert(job);
+		for(int i=0; i<machines.length; i++)
+			machines[i].activate(new TimeSpan(0));
 
-    }
-    public void lifeCycle(){
-
-        while(true){
-            Truck truck = new Truck(model);
-            truck.activate(new TimeSpan(0));
-
-            Double t = model.newTruckDistTime();
-            System.out.println("New truck " + t);
-            hold(new TimeSpan(t, TimeUnit.MINUTES));
-
-        }
-
-    }
+	}
+	public boolean isQueueEmpty(){
+		return queue.isEmpty();
+	}
 
 }

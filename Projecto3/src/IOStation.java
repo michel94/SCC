@@ -4,29 +4,37 @@ import java.util.concurrent.*;
 
 public class IOStation extends SimProcess{
 	MainModel model;
+	Station ioStation;
+	ContDistConstant jobTypeDist;
 
 	public IOStation(MainModel model){
-		super(model, "IOStation", true);
+		super(model, "IOStation", false, false);
 		this.model = model;
+		
 	}
 	public void init(){
-		
-		System.out.println("IOStation");
-		
+		jobTypeDist = new ContDistConstant(model, "jobTypeDist", 1, false, false);
 	}
 	public void lifeCycle(){
-		
-		while(true){
+		while(true){	
 
-			Job job = new Job(model);
-			job.activate(new TimeSpan(0));
+			int type;
+			double r = jobTypeDist.sample();
+			if(r < 0.3)
+				type = 0;
+			else if(r < 0.8)
+				type = 2;
+			else
+				type = 3;
+
+			Job job = new Job(model, type);
 
 			Double t = model.newJobDistTime();
 			System.out.println("New Job " + t);
 			hold(new TimeSpan(t, TimeUnit.MINUTES));
 			
+			model.getAvg().pushToQueue(job);
+
 		}
-
 	}
-
 }
