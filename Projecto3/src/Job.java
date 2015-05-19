@@ -3,6 +3,7 @@ import desmoj.core.dist.*;
 
 public class Job extends SimProcess{
 	Model model;
+	Machine curMachine = null;
 	int jobType;
 	int curTarget;
 	int[][] jobs = {{0, 3, 1, 2, 5}, 
@@ -19,7 +20,9 @@ public class Job extends SimProcess{
 	}
 	
 	public Motion getNextMotion() {
-		return new Motion(jobs[jobType][curTarget-1], jobs[jobType][curTarget-1]);
+		if(curMachine != null)
+			curMachine.activate();
+		return new Motion(jobs[jobType][curTarget-1], jobs[jobType][curTarget]);
 	}
 	public void advance(){
 		curTarget++;
@@ -34,7 +37,10 @@ public class Job extends SimProcess{
 		return curTarget - 1;
 	}
 	public int getCurrentStation(){
-		return jobs[jobType][curTarget - 1];
+		return jobs[jobType][curTarget - 1]-1;
+	}
+	public void setMachine(Machine m){
+
 	}
 
 	public void init(){

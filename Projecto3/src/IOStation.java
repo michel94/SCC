@@ -11,21 +11,22 @@ public class IOStation extends SimProcess{
 		super(model, "IOStation", false, false);
 		this.model = model;
 		
+		jobTypeDist = new ContDistConstant(model, "jobTypeDist", 1, false, false);
+		System.out.println("jobTypeDist");
 	}
 	public void init(){
-		jobTypeDist = new ContDistConstant(model, "jobTypeDist", 1, false, false);
 	}
 	public void lifeCycle(){
-		while(true){	
+		while(true){
 
 			int type;
 			double r = jobTypeDist.sample();
 			if(r < 0.3)
 				type = 0;
 			else if(r < 0.8)
-				type = 2;
+				type = 1;
 			else
-				type = 3;
+				type = 2;
 
 			Job job = new Job(model, type);
 

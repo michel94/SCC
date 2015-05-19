@@ -13,7 +13,7 @@ public class Station{
 		this.name = name;
 		machines = new Machine[nMachines];
 		for(int i=0; i<nMachines; i++)
-			machines[i] = new Machine(model, this);
+			machines[i] = new Machine(model, this, "Machine " + i);
 		
 		System.out.println("Station");
 		queue = new ProcessQueue<Job>(model, name + " Queue", true, true);
@@ -22,6 +22,7 @@ public class Station{
 	public Job popFromQueue(){
 		Job job = queue.first();
 		queue.remove(job);
+		System.out.println("Queue " + name + " size: " + queue.size());
 		return job;
 	}
 
@@ -29,10 +30,14 @@ public class Station{
 		queue.insert(job);
 		for(int i=0; i<machines.length; i++)
 			machines[i].activate(new TimeSpan(0));
+		System.out.println("Queue " + name + " size: " + queue.size());
 
 	}
 	public boolean isQueueEmpty(){
 		return queue.isEmpty();
+	}
+	public String getName(){
+		return name;
 	}
 
 }

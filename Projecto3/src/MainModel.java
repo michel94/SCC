@@ -7,7 +7,7 @@ public class MainModel extends Model {
 	double[][] meanServiceTimes = {{30, 36, 51, 30}, {66, 48, 45}, {72, 15, 42, 54, 60}};
 	ContDistErlang[][] serviceTimesDist;
 	Station[] stations;
-
+	int[] nMachines = {3, 3, 4, 4, 1};
 
 	public MainModel(){
 		super(null, "Main", true, true);
@@ -18,7 +18,7 @@ public class MainModel extends Model {
 		return "";
 	}
 	public void init(){
-		newJobDist = new ContDistExponential(this, "newJobDist", 15, true, false);
+		newJobDist = new ContDistExponential(this, "newJobDist", 15, true, true);
 		newJobDist.setNonNegative(true);
 
 		serviceTimesDist = new ContDistErlang[4][5];
@@ -28,7 +28,8 @@ public class MainModel extends Model {
 
 		stations = new Station[5];
 		for(int i=0; i<stations.length; i++)
-			stations[i] = new Station(this, "station " + i, meanServiceTimes[i].length);
+			stations[i] = new Station(this, "station " + (i+1), nMachines[i]);
+
 	}
 	public void doInitialSchedules() {
 		IOStation ioStation = new IOStation(this);
@@ -46,7 +47,7 @@ public class MainModel extends Model {
 	}
 
 	public double getServiceTime(int jobType, int curStage){
-		return serviceTimesDist[jobType][curStage].sample();
+		return serviceTimesDist[jobType][curStage-1].sample();
 	}
 	public Station getStation(int n){
 		return stations[n];

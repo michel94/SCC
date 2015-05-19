@@ -6,6 +6,7 @@ public class AVG extends SimProcess {
 	MainModel model;
 	ProcessQueue<Job> avgQueue;
 	int currentPos = 0;
+	int totalMovingTime = 0;
 	int[][] distances ={{0, 135,135,90,50 ,50, 0},
 						{135, 0  ,45 ,50,90 ,100},
 						{135, 45 ,0  ,50,100,90 },
@@ -14,16 +15,21 @@ public class AVG extends SimProcess {
 						{50, 100,90 ,50,45 ,0  }};
 
 	public AVG(MainModel model) {
-		super(model, "Truck", true);
+		super(model, "AVG", true, true);
 		this.model = model;
-	}
 
-	public void init() {
 		avgQueue = new ProcessQueue<Job>(model, "AVG Queue", true, true);
 	}
 
 	private void moveTo(int end){
-		hold(new TimeSpan(distances[currentPos][end] / 2.5, TimeUnit.MINUTES) );
+		double moveTime = distances[currentPos][end] / 2.5;
+		totalMovingTime += moveTime;
+		System.out.println(moveTime);
+		activate(new TimeSpan(0, TimeUnit.MINUTES));
+		if(moveTime > 0)
+			hold(new TimeSpan(moveTime, TimeUnit.MINUTES) );
+
+		System.out.println("Move from " + currentPos + " to " + end + ", distance " + distances[currentPos][end]);
 		currentPos = end;
 	}
 
