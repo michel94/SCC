@@ -6,7 +6,7 @@ public class Job extends Entity{
 	Machine curMachine = null;
 	int jobType;
 	int curTarget;
-	int[][] jobs = {{0, 3, 1, 2, 5}, 
+	int[][] jobs = {{0, 3, 1, 2, 5},
 				{0, 4, 1, 3},
 				{0, 2, 5, 1, 4, 3}};
 
@@ -18,7 +18,7 @@ public class Job extends Entity{
 		curTarget = 1;
 
 	}
-	
+
 	public Motion getNextMotion() {
 		if(curMachine != null)
 			curMachine.activate();
@@ -40,7 +40,7 @@ public class Job extends Entity{
 		return jobs[jobType][curTarget - 1]-1;
 	}
 	public void setMachine(Machine m){
-
+		curMachine = m;
 	}
 
 }

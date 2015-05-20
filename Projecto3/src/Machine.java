@@ -6,20 +6,23 @@ public class Machine extends SimProcess{
 	MainModel model;
 	Station station;
 	String name;
-	
+	public boolean isWorking = false;
+
 	public Machine(MainModel model, Station station, String name){
 		super(model, name, true, true);
 		this.model = model;
-		this.station = station;	
+		this.station = station;
 		this.name = name;
 	}
 	public void init(){
 	}
-	
+
 	public void lifeCycle(){
 		while(true){
+			isWorking = false;
 			while(station.isQueueEmpty())
 				passivate();
+			isWorking = true;
 
 			Job job = station.popFromQueue();
 			int jobType = job.getJobType();
@@ -29,6 +32,7 @@ public class Machine extends SimProcess{
 			hold(new TimeSpan(model.getServiceTime(jobType, curStage), TimeUnit.MINUTES) );
 
 			job.setMachine(this);
+			passivate();
 			if(!job.isLastStation())
 				model.getAvg().pushToQueue(job);
 

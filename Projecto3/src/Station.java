@@ -14,11 +14,11 @@ public class Station{
 		machines = new Machine[nMachines];
 		for(int i=0; i<nMachines; i++)
 			machines[i] = new Machine(model, this, "Machine " + i);
-		
+
 		System.out.println("Station");
 		queue = new Queue<Job>(model, name + " Queue", true, true);
 	}
-	
+
 	public Job popFromQueue(){
 		Job job = queue.first();
 		queue.remove(job);
@@ -29,10 +29,13 @@ public class Station{
 	public void pushToQueue(Job job){
 		queue.insert(job);
 		for(int i=0; i<machines.length; i++)
-			machines[i].activate(new TimeSpan(0));
+			if(!machines[i].isWorking){
+				machines[i].activate(new TimeSpan(0));
+				break;
+			}
 		System.out.println("Queue " + name + " size: " + queue.size());
-
 	}
+
 	public boolean isQueueEmpty(){
 		return queue.isEmpty();
 	}

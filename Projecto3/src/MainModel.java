@@ -29,7 +29,7 @@ public class MainModel extends Model {
 		stations = new Station[5];
 		for(int i=0; i<stations.length; i++)
 			stations[i] = new Station(this, "station " + (i+1), nMachines[i]);
-
+		
 	}
 	public void doInitialSchedules() {
 		IOStation ioStation = new IOStation(this);
@@ -37,7 +37,7 @@ public class MainModel extends Model {
 
 		avg = new AVG(this);
 		avg.activate(new TimeSpan(0));
-		
+
 	}
 	public AVG getAvg(){
 		return avg;

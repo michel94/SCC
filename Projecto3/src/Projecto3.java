@@ -10,10 +10,10 @@ public class Projecto3{
         //and link them
         model.connectToExperiment(exp);
         //initialize experiments parameters
-        exp.setShowProgressBar(true);
+        exp.setShowProgressBar(false);
         exp.tracePeriod(new TimeInstant(0.0), new TimeInstant(10000));
         exp.debugPeriod(new TimeInstant(0.0), new TimeInstant(10000));
-        exp.stop(new TimeInstant(2900 * 60, TimeUnit.MINUTES));
+        exp.stop(new TimeInstant(1000 * 60, TimeUnit.MINUTES));
         //start experiment
         exp.start();
         //generate report and shut everything down
