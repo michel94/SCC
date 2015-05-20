@@ -1,7 +1,7 @@
 import desmoj.core.simulator.*;
 import desmoj.core.dist.*;
 
-public class Job extends SimProcess{
+public class Job extends Entity{
 	Model model;
 	Machine curMachine = null;
 	int jobType;
@@ -40,13 +40,6 @@ public class Job extends SimProcess{
 		return jobs[jobType][curTarget - 1]-1;
 	}
 	public void setMachine(Machine m){
-
-	}
-
-	public void init(){
-
-	}
-	public void lifeCycle(){
 
 	}
 

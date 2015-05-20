@@ -4,9 +4,9 @@ import java.util.concurrent.*;
 
 public class Station{
 	MainModel model;
-	ProcessQueue<Job> queue;
-	String name;
 	Machine[] machines;
+	public String name;
+	public Queue<Job> queue;
 
 	public Station(MainModel model, String name, int nMachines){
 		this.model = model;
@@ -16,7 +16,7 @@ public class Station{
 			machines[i] = new Machine(model, this, "Machine " + i);
 		
 		System.out.println("Station");
-		queue = new ProcessQueue<Job>(model, name + " Queue", true, true);
+		queue = new Queue<Job>(model, name + " Queue", true, true);
 	}
 	
 	public Job popFromQueue(){

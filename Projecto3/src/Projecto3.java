@@ -11,8 +11,8 @@ public class Projecto3{
         model.connectToExperiment(exp);
         //initialize experiments parameters
         exp.setShowProgressBar(true);
-        exp.tracePeriod(new TimeInstant(0.0), new TimeInstant(100));
-        exp.debugPeriod(new TimeInstant(0.0), new TimeInstant(100));
+        exp.tracePeriod(new TimeInstant(0.0), new TimeInstant(10000));
+        exp.debugPeriod(new TimeInstant(0.0), new TimeInstant(10000));
         exp.stop(new TimeInstant(2900 * 60, TimeUnit.MINUTES));
         //start experiment
         exp.start();

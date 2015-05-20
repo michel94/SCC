@@ -4,7 +4,7 @@ import java.util.concurrent.*;
 
 public class AVG extends SimProcess {
 	MainModel model;
-	ProcessQueue<Job> avgQueue;
+	Queue<Job> avgQueue;
 	int currentPos = 0;
 	int totalMovingTime = 0;
 	int[][] distances ={{0, 135,135,90,50 ,50, 0},
@@ -13,21 +13,26 @@ public class AVG extends SimProcess {
 						{90, 50 ,50 ,0 ,50 ,50 },
 						{50, 90 ,100,50,0  ,45 },
 						{50, 100,90 ,50,45 ,0  }};
+	boolean onHold = false;					
 
 	public AVG(MainModel model) {
 		super(model, "AVG", true, true);
 		this.model = model;
 
-		avgQueue = new ProcessQueue<Job>(model, "AVG Queue", true, true);
+		avgQueue = new Queue<Job>(model, "AVG Queue", true, true);
 	}
 
 	private void moveTo(int end){
 		double moveTime = distances[currentPos][end] / 2.5;
 		totalMovingTime += moveTime;
-		System.out.println(moveTime);
-		activate(new TimeSpan(0, TimeUnit.MINUTES));
-		if(moveTime > 0)
+		
+		if(moveTime > 0){
+			sendTraceNote("hold");
+			onHold = true;
 			hold(new TimeSpan(moveTime, TimeUnit.MINUTES) );
+			onHold = false;
+		}
+
 
 		System.out.println("Move from " + currentPos + " to " + end + ", distance " + distances[currentPos][end]);
 		currentPos = end;
@@ -44,7 +49,9 @@ public class AVG extends SimProcess {
 				moveTo(m.end);
 
 				job.advance();
-				model.getStation(job.getCurrentStation()).pushToQueue(job);
+				Station s = model.getStation(job.getCurrentStation());
+				s.pushToQueue(job);
+				sendTraceNote("Queue " + s.name + " size: " + s.queue.size());
 			}else{
 				passivate();
 			}
@@ -55,7 +62,8 @@ public class AVG extends SimProcess {
 
 	public void pushToQueue(Job job){
 		avgQueue.insert(job);
-		activate(new TimeSpan(0));
+		if(!onHold)
+			activate(new TimeSpan(0));
 	}
 
 }

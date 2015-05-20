@@ -15,7 +15,7 @@ public class Machine extends SimProcess{
 	}
 	public void init(){
 	}
-
+	
 	public void lifeCycle(){
 		while(true){
 			while(station.isQueueEmpty())
@@ -31,7 +31,6 @@ public class Machine extends SimProcess{
 			job.setMachine(this);
 			if(!job.isLastStation())
 				model.getAvg().pushToQueue(job);
-
 
 		}
 	}
