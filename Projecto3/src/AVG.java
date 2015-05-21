@@ -23,7 +23,7 @@ public class AVG extends SimProcess {
 	}
 
 	private void moveTo(int end){
-		double moveTime = distances[currentPos][end] / 2.5;
+		double moveTime = distances[currentPos][end] / 150;
 		totalMovingTime += moveTime;
 
 		if(moveTime > 0){

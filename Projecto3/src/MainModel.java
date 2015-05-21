@@ -28,8 +28,8 @@ public class MainModel extends Model {
 
 		stations = new Station[5];
 		for(int i=0; i<stations.length; i++)
-			stations[i] = new Station(this, "station " + (i+1), nMachines[i]);
-		
+			stations[i] = new Station(this, "Station " + (char)(i+65), nMachines[i]);
+
 	}
 	public void doInitialSchedules() {
 		IOStation ioStation = new IOStation(this);
