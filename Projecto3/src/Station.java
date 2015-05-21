@@ -22,18 +22,19 @@ public class Station{
 	public Job popFromQueue(){
 		Job job = queue.first();
 		queue.remove(job);
-		System.out.println("Queue " + name + " size: " + queue.size());
+		System.out.println("Poped to queue " + name + ". Size: " + queue.size());
 		return job;
 	}
 
 	public void pushToQueue(Job job){
 		queue.insert(job);
-		for(int i=0; i<machines.length; i++)
+		for(int i=0; i<machines.length; i++){
 			if(!machines[i].isWorking){
 				machines[i].activate(new TimeSpan(0));
 				break;
 			}
-		System.out.println("Queue " + name + " size: " + queue.size());
+		}
+		System.out.println("Pushed to queue " + name + ". Size: " + queue.size());
 	}
 
 	public boolean isQueueEmpty(){

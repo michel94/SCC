@@ -13,7 +13,7 @@ public class AVG extends SimProcess {
 						{90, 50 ,50 ,0 ,50 ,50 },
 						{50, 90 ,100,50,0  ,45 },
 						{50, 100,90 ,50,45 ,0  }};
-	boolean onHold = false;					
+	boolean onHold = false;
 
 	public AVG(MainModel model) {
 		super(model, "AVG", true, true);
@@ -25,7 +25,7 @@ public class AVG extends SimProcess {
 	private void moveTo(int end){
 		double moveTime = distances[currentPos][end] / 2.5;
 		totalMovingTime += moveTime;
-		
+
 		if(moveTime > 0){
 			sendTraceNote("hold");
 			onHold = true;

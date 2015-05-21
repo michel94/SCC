@@ -25,6 +25,7 @@ public class Job extends Entity{
 		return new Motion(jobs[jobType][curTarget-1], jobs[jobType][curTarget]);
 	}
 	public void advance(){
+		System.out.println("advance");
 		curTarget++;
 	}
 	public boolean isLastStation(){

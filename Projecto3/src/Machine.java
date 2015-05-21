@@ -7,6 +7,7 @@ public class Machine extends SimProcess{
 	Station station;
 	String name;
 	public boolean isWorking = false;
+	public boolean waiting = false;
 
 	public Machine(MainModel model, Station station, String name){
 		super(model, name, true, true);
@@ -27,15 +28,17 @@ public class Machine extends SimProcess{
 			Job job = station.popFromQueue();
 			int jobType = job.getJobType();
 			int curStage = job.getCurrentStage();
-			System.out.println("on " + station.getName() + ", " + name + ", job " + jobType + ", " + curStage);
+			System.out.println("On " + station.getName() + ", " + name + ", job " + jobType + ", " + curStage);
 
 			hold(new TimeSpan(model.getServiceTime(jobType, curStage), TimeUnit.MINUTES) );
-
 			job.setMachine(this);
-			passivate();
-			if(!job.isLastStation())
-				model.getAvg().pushToQueue(job);
 
+
+			if(!job.isLastStation()){
+				model.getAvg().pushToQueue(job);
+				//System.out.println("pushed to other queue");
+				passivate();
+			}
 		}
 	}
 }
