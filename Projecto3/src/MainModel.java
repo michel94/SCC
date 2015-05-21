@@ -32,8 +32,10 @@ public class MainModel extends Model {
 
 	}
 	public void doInitialSchedules() {
-		IOStation ioStation = new IOStation(this);
-		ioStation.activate(new TimeSpan(0));
+		Station ioStation = new Station(this, "IOStation", 1);
+
+		JobGenerator jg = new JobGenerator(this, ioStation);
+		jg.activate(new TimeSpan(0));
 
 		avg = new AVG(this);
 		avg.activate(new TimeSpan(0));
@@ -47,6 +49,8 @@ public class MainModel extends Model {
 	}
 
 	public double getServiceTime(int jobType, int curStage){
+		if(curStage-1 < 0)
+			return 0;
 		return serviceTimesDist[jobType][curStage-1].sample();
 	}
 	public Station getStation(int n){

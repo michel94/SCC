@@ -49,9 +49,15 @@ public class AVG extends SimProcess {
 				moveTo(m.end);
 
 				job.advance();
-				Station s = model.getStation(job.getCurrentStation());
-				s.pushToQueue(job);
-				sendTraceNote("Queue " + s.name + " size: " + s.queue.size());
+				if(!job.isLastStation()){
+					Station s = model.getStation(job.getCurrentStation());
+					s.pushToQueue(job);
+					sendTraceNote("Queue " + s.name + " size: " + s.queue.size());
+				}else{
+					System.out.println(">>>>>>>>>>>>>>>> Finished job");
+				}
+				
+
 			}else{
 				passivate();
 			}

@@ -6,9 +6,9 @@ public class Job extends Entity{
 	Machine curMachine = null;
 	int jobType;
 	int curTarget;
-	int[][] jobs = {{0, 3, 1, 2, 5},
-				{0, 4, 1, 3},
-				{0, 2, 5, 1, 4, 3}};
+	int[][] jobs = {{0, 3, 1, 2, 5, 0},
+				{0, 4, 1, 3, 0},
+				{0, 2, 5, 1, 4, 3, 0}};
 
 	public Job(Model model, int jobType) {
 		super(model, "Job", true);
