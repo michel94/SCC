@@ -19,6 +19,8 @@ public class Projecto3{
         //generate report and shut everything down
         exp.report();
         exp.finish();
+        
+        System.out.println(model.getAvg().totalMovingTime);
 
         for(int i=0; i<3; i++)
             System.out.println("Job Type:" + i + " AvgMeanWaitTime " + model.avgWaitTime[i] / model.finished + " QueueMeanWaitTime " + model.queueWaitTime[i] / model.finished );
