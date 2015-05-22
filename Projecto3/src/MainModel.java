@@ -8,6 +8,9 @@ public class MainModel extends Model {
 	ContDistErlang[][] serviceTimesDist;
 	Station[] stations;
 	int[] nMachines = {3, 3, 4, 4, 1};
+	public double[] avgWaitTime = new double[3];
+	public double[] queueWaitTime = new double[3];
+	public int finished = 0;
 
 	public MainModel(){
 		super(null, "Main", true, true);

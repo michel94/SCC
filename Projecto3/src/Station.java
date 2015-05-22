@@ -22,12 +22,14 @@ public class Station{
 	public Job popFromQueue(){
 		Job job = queue.first();
 		queue.remove(job);
+		job.addQueueWaitTime();
 		System.out.println("Poped to queue " + name + ". Size: " + queue.size());
 		return job;
 	}
-
+	
 	public void pushToQueue(Job job){
 		queue.insert(job);
+		job.fetchTime();
 		for(int i=0; i<machines.length; i++){
 			if(!machines[i].isWorking){
 				machines[i].activate(new TimeSpan(0));

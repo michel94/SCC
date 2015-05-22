@@ -42,6 +42,7 @@ public class AVG extends SimProcess {
 			if(!avgQueue.isEmpty()){
 				Job job = avgQueue.first();
 				avgQueue.remove(job);
+				job.addAvgWaitTime();
 
 				Motion m = job.getNextMotion();
 				moveTo(m.start);
@@ -53,7 +54,10 @@ public class AVG extends SimProcess {
 					s.pushToQueue(job);
 					sendTraceNote("Queue " + s.name + " size: " + s.queue.size());
 				}else{
-					System.out.println(">>>>>>>>>>>>>>>> Finished job");
+					System.out.println(">>>>> >>>>> >>>>> Finished job, avgWaitTime: " + job.avgWaitTime + ", queueWaitTime: " + job.queueWaitTime);
+					model.avgWaitTime[job.jobType] += job.avgWaitTime;
+					model.queueWaitTime[job.jobType] += job.queueWaitTime;
+					model.finished++;
 				}
 				
 
@@ -66,6 +70,7 @@ public class AVG extends SimProcess {
 	}
 
 	public void pushToQueue(Job job){
+		job.fetchTime();
 		avgQueue.insert(job);
 		if(!onHold)
 			activate(new TimeSpan(0));
