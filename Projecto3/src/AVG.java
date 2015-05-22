@@ -6,7 +6,7 @@ public class AVG extends SimProcess {
 	MainModel model;
 	Queue<Job> avgQueue;
 	int currentPos = 0;
-	int totalMovingTime = 0;
+	double totalMovingTime = 0;
 	int[][] distances ={{0, 135,135,90,50 ,50, 0},
 						{135, 0  ,45 ,50,90 ,100},
 						{135, 45 ,0  ,50,100,90 },
@@ -23,9 +23,8 @@ public class AVG extends SimProcess {
 	}
 
 	private void moveTo(int end){
-		double moveTime = distances[currentPos][end] / 150;
+		double moveTime = distances[currentPos][end] / 150.0;
 		totalMovingTime += moveTime;
-
 		if(moveTime > 0){
 			sendTraceNote("hold");
 			onHold = true;
