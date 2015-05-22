@@ -11,6 +11,8 @@ public class MainModel extends Model {
 	public double[] avgWaitTime = new double[3];
 	public double[] queueWaitTime = new double[3];
 	public int finished = 0;
+	public double cycleTime = 0;
+	public int extra = -1;
 
 	public MainModel(){
 		super(null, "Main", true, true);
@@ -30,8 +32,12 @@ public class MainModel extends Model {
 				serviceTimesDist[t][i] = new ContDistErlang(this, "serviceTimesDist " + t + ", " + i, 1, meanServiceTimes[t][i], false, false);
 
 		stations = new Station[5];
-		for(int i=0; i<stations.length; i++)
-			stations[i] = new Station(this, "Station " + (char)(i+65), nMachines[i]);
+		for(int i=0; i<stations.length; i++){
+			int m = nMachines[i];
+			if(i == extra)
+				m += 2;
+			stations[i] = new Station(this, "Station " + (char)(i+65), m);
+		}
 
 	}
 	public void doInitialSchedules() {

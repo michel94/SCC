@@ -6,6 +6,8 @@ public class Projecto3{
     public static void main (String[] args) {
         //create model and experiment
         MainModel model = new MainModel();
+        System.out.println(args[0]);
+        model.extra = Integer.parseInt(args[0]);
         Experiment exp = new Experiment("MyExperiment", TimeUnit.SECONDS, TimeUnit.MINUTES, null);
         //and link them
         model.connectToExperiment(exp);
@@ -24,5 +26,6 @@ public class Projecto3{
 
         for(int i=0; i<3; i++)
             System.out.println("Job Type:" + i + " AvgMeanWaitTime " + model.avgWaitTime[i] / model.finished + " QueueMeanWaitTime " + model.queueWaitTime[i] / model.finished );
+        System.out.println("Mean Cycle Time: " + model.cycleTime / model.finished);
     }
 }

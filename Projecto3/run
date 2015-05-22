@@ -1,1 +1,1 @@
-java -cp lib/desmoj.jar:src/ Projecto3
+java -cp lib/desmoj.jar:src/ Projecto3 $*

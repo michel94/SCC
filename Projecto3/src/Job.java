@@ -11,7 +11,7 @@ public class Job extends Entity{
 				{0, 4, 1, 3, 0},
 				{0, 2, 5, 1, 4, 3, 0}};
 
-	public double time, avgWaitTime = 0, queueWaitTime = 0;
+	public double time, avgWaitTime = 0, queueWaitTime = 0, startTime = 0;
 
 	public Job(Model model, int jobType) {
 		super(model, "Job", true);
@@ -20,6 +20,8 @@ public class Job extends Entity{
 		this.jobType = jobType;
 		curTarget = 1;
 
+		fetchTime();
+		startTime = time;
 	}
 	public void fetchTime(){
 		time = model.getExperiment().getSimClock().getTime().getTimeAsDouble(TimeUnit.MINUTES);

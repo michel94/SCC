@@ -58,6 +58,8 @@ public class AVG extends SimProcess {
 					model.avgWaitTime[job.jobType] += job.avgWaitTime;
 					model.queueWaitTime[job.jobType] += job.queueWaitTime;
 					model.finished++;
+					job.fetchTime();
+					model.cycleTime += job.time - job.startTime;
 				}
 				
 
