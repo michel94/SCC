@@ -1,5 +1,6 @@
 import desmoj.core.simulator.*;
 import desmoj.core.dist.*;
+import java.util.concurrent.*;
 
 public class Job extends Entity{
 	Model model;
@@ -10,6 +11,8 @@ public class Job extends Entity{
 				{0, 4, 1, 3, 0},
 				{0, 2, 5, 1, 4, 3, 0}};
 
+	public double time, avgWaitTime = 0, queueWaitTime = 0;
+
 	public Job(Model model, int jobType) {
 		super(model, "Job", true);
 
@@ -17,6 +20,9 @@ public class Job extends Entity{
 		this.jobType = jobType;
 		curTarget = 1;
 
+	}
+	public void fetchTime(){
+		time = model.getExperiment().getSimClock().getTime().getTimeAsDouble(TimeUnit.MINUTES);
 	}
 
 	public Motion getNextMotion() {
@@ -43,5 +49,13 @@ public class Job extends Entity{
 	public void setMachine(Machine m){
 		curMachine = m;
 	}
+	public void addAvgWaitTime(){
+		avgWaitTime += model.getExperiment().getSimClock().getTime().getTimeAsDouble(TimeUnit.MINUTES) - time;
+	}
+	public void addQueueWaitTime(){
+		queueWaitTime += model.getExperiment().getSimClock().getTime().getTimeAsDouble(TimeUnit.MINUTES) - time;
+	}
+
+
 
 }
