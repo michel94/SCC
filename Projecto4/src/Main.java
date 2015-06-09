@@ -90,6 +90,26 @@ public class Main{
     return result;
   }
 
+  public int RunsTest(double[] d){
+    double data[] = Arrays.copyOf(d, d.length),
+         sorted[] = Arrays.copyOf(d, d.length);
+    boolean plus[] = new boolean[d.length];
+
+    Arrays.sort(sorted);
+    double med = sorted[sorted.length / 2];
+
+    int runs = 0;
+    for(int i=1; i<data.length; i++){
+      if( (data[i-1] > med) != (data[i] > med) )
+        runs++;
+    }
+
+    System.out.println("RunsTest: " + runs);
+
+    return runs;
+
+  }
+
   public Main(){
     data = new double[n];
     EmptyModel emptyModel = new EmptyModel();
@@ -107,6 +127,7 @@ public class Main{
     KSTest(data);
     TwoLevelTest(data);
     ThreeLevelTest(data);
+    RunsTest(data);
 
     /*double trTest = TwoLevelTest(data);
     double limit = chiSquare(30*30-1, 1-0.05);
