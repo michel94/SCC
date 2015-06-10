@@ -1,7 +1,9 @@
 import desmoj.core.simulator.*;
 import desmoj.core.dist.*;
 import java.util.concurrent.*;
-import java.util.Arrays;
+import java.util.*;
+import java.nio.file.*;
+import java.io.*;
 
 public class Main{
   double data[];
@@ -110,6 +112,75 @@ public class Main{
 
   }
 
+  class WeightRank{
+    private int count=0;
+    private double rank=0;
+    public WeightRank() {
+    }
+    public void addRank(int rank){
+      this.rank += rank;
+      count++;
+    }
+    public double getRank(){
+      return rank / count;
+    }
+
+  }
+
+  public double Kruskal(double[] d1, double[] d2){
+    int n1 = d1.length, n2 = d2.length;
+    int N = n1 + n2;
+
+    double sorted[] = new double[N];
+    System.arraycopy(d1, 0, sorted, 0, n1);
+    System.arraycopy(d2, 0, sorted, n1, n2);
+    Arrays.sort(sorted);
+
+    Hashtable<Double, WeightRank> dict = new Hashtable<Double, WeightRank>();
+
+    for(int i=0; i<sorted.length; i++){
+      if(!dict.containsKey(sorted[i]))
+        dict.put(sorted[i], new WeightRank() );
+      dict.get(sorted[i]).addRank(i+1);
+    }
+
+    double rank1[], rank2[];
+    rank1 = new double[n1];
+    rank2 = new double[n2];
+
+    double r1_avg=0, r2_avg=0;
+
+    for(int i=0; i<rank1.length; i++){
+      rank1[i] = dict.get(d1[i]).getRank();
+      r1_avg += rank1[i];
+    }
+    r1_avg /= n1;
+
+    for(int i=0; i<rank2.length; i++){
+      rank2[i] = dict.get(d2[i]).getRank();
+      r2_avg += rank2[i];
+    }
+    r2_avg /= n2;
+
+    double r_avg = 0.5 * (N + 1);
+
+    double usum = n1 * Math.pow(r1_avg - r_avg, 2) +
+                  n2 * Math.pow(r2_avg - r_avg, 2);
+
+    double dsum = 0;
+    for(int i=0; i<n1; i++){
+      dsum += Math.pow(rank1[i] - r_avg, 2);
+    }
+    for(int i=0; i<n2; i++){
+      dsum += Math.pow(rank2[i] - r_avg, 2);
+    }
+
+    double K = (N-1) * usum / dsum;
+
+    return K;
+
+  }
+
   public Main(){
     data = new double[n];
     EmptyModel emptyModel = new EmptyModel();
@@ -128,6 +199,34 @@ public class Main{
     TwoLevelTest(data);
     ThreeLevelTest(data);
     RunsTest(data);
+
+    //double kruskal = Kruskal(new double[]{1, 2, 3, 4}, new double[]{1, 2, 3, 4, 5});
+
+    Path file1 = Paths.get("kruskal1.txt"), file2 = Paths.get("kruskal2.txt");
+    double d1[], d2[];
+
+    try {
+      Scanner sc = new Scanner(file1);
+      int n1 = sc.nextInt();
+      d1 = new double[n1];
+      for(int i=0; i<n1; i++){
+        d1[i] = sc.nextDouble();
+      }
+
+      sc = new Scanner(file2);
+      int n2 = sc.nextInt();
+      d2 = new double[n2];
+      for(int i=0; i<n2; i++){
+        d2[i] = sc.nextDouble();
+      }
+    } catch (IOException e) {
+      System.out.println("Reading error " + e);
+      return;
+    }
+
+    double kruskal = Kruskal(d1, d2);
+    double crit = chiSquareDist(1, 0.05);
+    System.out.println("kruskal-Wallis: " + kruskal);
 
     /*double trTest = TwoLevelTest(data);
     double limit = chiSquare(30*30-1, 1-0.05);
