@@ -8,6 +8,10 @@ public class Machine extends SimProcess{
 	String name;
 	public boolean isWorking = false;
 	public boolean waiting = false;
+	double totalWorkingTime = 0;
+	double totalBlockedTime = 0;
+	double totalIdleTime = 0;
+	double time = 0;
 
 	public Machine(MainModel model, Station station, String name){
 		super(model, name, true, true);
@@ -18,6 +22,9 @@ public class Machine extends SimProcess{
 	public void init(){
 	}
 
+	public void fetchTime(){
+		time = model.getExperiment().getSimClock().getTime().getTimeAsDouble(TimeUnit.MINUTES);
+	}
 	public void lifeCycle(){
 		while(true){
 			isWorking = false;
@@ -30,14 +37,18 @@ public class Machine extends SimProcess{
 			int curStage = job.getCurrentStage();
 			System.out.println("On " + station.getName() + ", " + name + ", job " + jobType + ", " + curStage);
 
-			hold(new TimeSpan(model.getServiceTime(jobType, curStage), TimeUnit.MINUTES) );
+			double t = model.getServiceTime(jobType, curStage);
+			totalWorkingTime += t;
+			hold(new TimeSpan(t, TimeUnit.MINUTES) );
 			job.setMachine(this);
 
 
 			if(!job.isLastStation()){
 				model.getAvg().pushToQueue(job);
 				//System.out.println("pushed to other queue");
+				fetchTime();
 				passivate();
+				totalBlockedTime += model.getExperiment().getSimClock().getTime().getTimeAsDouble(TimeUnit.MINUTES) - time;
 			}
 		}
 	}
