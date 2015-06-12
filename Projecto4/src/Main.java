@@ -29,7 +29,7 @@ public class Main{
       minDiff = max( Math.sqrt(n) * i * (x - (i+1.0)/n ), minDiff );
       //minDiff = max( Math.sqrt(n) * data[i] * (i/n - data[i]), minDiff );
     }
-    System.out.println("Kolmogorov: " + minDiff + " " + maxDiff + " " + "TODO" );
+    System.out.println("1 - Kolmogorov: " + minDiff + " " + maxDiff + " " + "TODO" );
   }
 
   public double coisa(int k){
@@ -70,7 +70,7 @@ public class Main{
       minDiff = max( Math.sqrt(n) * i * (e - (i)/(double)n ), minDiff );
       //minDiff = max( Math.sqrt(n) * data[i] * (i/n - data[i]), minDiff );
     }
-    System.out.println("Kolmogorov-Smirnov Test Triangular: " + minDiff + " " + maxDiff);
+    System.out.println("2 - Kolmogorov-Smirnov Test Triangular: " + minDiff + " " + maxDiff);
   }
 
   public double TwoLevelTest(double d[]){
@@ -87,7 +87,7 @@ public class Main{
     }
     double result = chiSquareTest(count, (n/2.0) / (k*k) );
     double limit = chiSquareDist(k*k-1, 1-0.05);
-    System.out.println("TwoLevelTest: " + result + " " + limit);
+    System.out.println("  - TwoLevelTest: " + result + " " + limit);
 
     return result;
   }
@@ -108,7 +108,7 @@ public class Main{
     }
     double result = chiSquareTest(count, (n/3.0) / (k*k*k) );
     double limit = chiSquareDist(k*k*k-1, 1-0.05);
-    System.out.println("ThreeLevelTest: " + result + " " + limit);
+    System.out.println("  - ThreeLevelTest: " + result + " " + limit);
 
     return result;
   }
@@ -127,7 +127,7 @@ public class Main{
         runs++;
     }
 
-    System.out.println("RunsTest: " + runs);
+    System.out.println("  - RunsTest: " + runs);
 
     return runs;
 
@@ -145,6 +145,36 @@ public class Main{
     public double getRank(){
       return rank / count;
     }
+
+  }
+
+  public double WeibullEstim(double data[]){
+    double k = 1, l, sum=0;
+    int n = data.length;
+
+    double dif=10000;
+    for(double kx=0; kx<3; kx+=0.01){
+      double s=0, s2=0, s3=0;
+      for(int i=0; i<data.length; i++){
+        s += Math.log(data[i]) / Math.log(Math.E) * Math.pow(data[i], kx);
+        s2+= Math.pow(data[i], kx);
+        s3+= Math.log(data[i]) / Math.log(Math.E);
+      }
+      double t = 1 / kx - s/s2 + s3/n;
+      if( Math.abs(t) < Math.abs(dif) ){
+        dif = t;
+        k = kx;
+      }
+    }
+
+    for(int i=0; i<n; i++){
+      sum += Math.pow(data[i], k);
+    }
+    l = Math.pow(sum / n, 1/k);
+
+    System.out.println("3b- Weibull: alpha = " + k + ", beta = " + l);
+
+    return l;
 
   }
 
@@ -247,15 +277,19 @@ public class Main{
       return;
     }
 
+    KSTestTriangular(data, dataAux);
+
     double kruskal = Kruskal(d1, d2);
     double crit = 3.8415;
-    System.out.println("kruskal-Wallis: " + kruskal + " " + crit);
+    System.out.println("3a- kruskal-Wallis: " + kruskal + " " + crit);
+
+
+    WeibullEstim(d1);
 
     /*double trTest = TwoLevelTest(data);
     double limit = chiSquare(30*30-1, 1-0.05);
     System.out.println("TwoLevelTest " + trTest + " " + limit);
 */
-    KSTestTriangular(data, dataAux);
   }
 
   public static void main(String[] args) {
