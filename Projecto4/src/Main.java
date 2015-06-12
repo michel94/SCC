@@ -55,18 +55,20 @@ public class Main{
   }
 
   public void KSTestTriangular(double d1[], double d2[]){
-    double data1[] = Arrays.copyOf(d1, d1.length);
-    double data2[] = Arrays.copyOf(d2, d2.length);
-    Arrays.sort(data1);
-    Arrays.sort(data2);
+    double data[] = new double[d1.length];
 
+    for(int i=0; i<n; i++){
+      data[i] = max(d1[i], d2[i]);
+    }
+
+    Arrays.sort(data);
     double maxDiff = 0.0, minDiff = 0.0;
 
     for(int i=0; i<n; i++){
       //System.out.println(data[i] + " " + (i+1)/(double)n);
-      double maxRandomNumber = max(data1[i],data2[i]);
+      double maxRandomNumber = data[i];
       double e = Math.pow(maxRandomNumber, 2);
-      maxDiff = max( Math.sqrt(n) * i * (i+1/(double)n - e ), maxDiff );
+      maxDiff = max( Math.sqrt(n) * i * ( (i+1)/(double)n - e ), maxDiff );
       minDiff = max( Math.sqrt(n) * i * (e - (i)/(double)n ), minDiff );
       //minDiff = max( Math.sqrt(n) * data[i] * (i/n - data[i]), minDiff );
     }
