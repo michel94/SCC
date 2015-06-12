@@ -24,11 +24,12 @@ public class Main{
 
     for(int i=0; i<n; i++){
       //System.out.println(data[i] + " " + (i+1)/(double)n);
-      maxDiff = max( Math.sqrt(n) * data[i] * (data[i] - (i+1)/(double)n ), maxDiff );
-      minDiff = max( Math.sqrt(n) * data[i] * ((i+1)/(double)n - data[i] ), minDiff );
+      double x = data[i];
+      maxDiff = max( Math.sqrt(n) * i * ((i+1.0)/n - x ), maxDiff );
+      minDiff = max( Math.sqrt(n) * i * (x - (i+1.0)/n ), minDiff );
       //minDiff = max( Math.sqrt(n) * data[i] * (i/n - data[i]), minDiff );
     }
-    System.out.println("Kolmogorov: " + minDiff + " " + maxDiff);
+    System.out.println("Kolmogorov: " + minDiff + " " + maxDiff + " " + chiSquareDist(n, 0.05) );
   }
 
   public double coisa(int k){
@@ -247,8 +248,8 @@ public class Main{
     }
 
     double kruskal = Kruskal(d1, d2);
-    double crit = chiSquareDist(1, 0.05);
-    System.out.println("kruskal-Wallis: " + kruskal);
+    double crit = 3.8415;
+    System.out.println("kruskal-Wallis: " + kruskal + " " + crit);
 
     /*double trTest = TwoLevelTest(data);
     double limit = chiSquare(30*30-1, 1-0.05);
