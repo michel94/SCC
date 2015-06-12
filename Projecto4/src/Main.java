@@ -25,11 +25,17 @@ public class Main{
     for(int i=0; i<n; i++){
       //System.out.println(data[i] + " " + (i+1)/(double)n);
       double x = data[i];
-      maxDiff = max( Math.sqrt(n) * i * ((i+1.0)/n - x ), maxDiff );
-      minDiff = max( Math.sqrt(n) * i * (x - (i+1.0)/n ), minDiff );
+      maxDiff = max( ((i+1.0)/n - x ), maxDiff );
+      minDiff = max( (x - (i)/n ), minDiff );
       //minDiff = max( Math.sqrt(n) * data[i] * (i/n - data[i]), minDiff );
     }
-    System.out.println("1 - Kolmogorov: " + minDiff + " " + maxDiff + " " + "TODO" );
+    double diff;
+    if(maxDiff > minDiff)
+      diff = maxDiff;
+    else
+      diff = minDiff;
+    //diff = (Math.sqrt(n) + 0.12 + 0.11/Math.sqrt(n)) * diff;
+    System.out.println("1 - Kolmogorov: " + diff + " " + 1.358);
   }
 
   public double coisa(int k){
@@ -54,8 +60,10 @@ public class Main{
 
   }
 
+
   public void KSTestTriangular(double d1[], double d2[]){
     double data[] = new double[d1.length];
+    int n = data.length;
 
     for(int i=0; i<n; i++){
       data[i] = max(d1[i], d2[i]);
@@ -64,15 +72,23 @@ public class Main{
     Arrays.sort(data);
     double maxDiff = 0.0, minDiff = 0.0;
 
+    System.out.println(n);
     for(int i=0; i<n; i++){
       //System.out.println(data[i] + " " + (i+1)/(double)n);
       double maxRandomNumber = data[i];
       double e = Math.pow(maxRandomNumber, 2);
-      maxDiff = max( Math.sqrt(n) * i * ( (i+1)/(double)n - e ), maxDiff );
-      minDiff = max( Math.sqrt(n) * i * (e - (i)/(double)n ), minDiff );
+      maxDiff = max( ( (i+1.0)/n - e ), maxDiff );
+      minDiff = max( (e - i/(double)n ), minDiff );
       //minDiff = max( Math.sqrt(n) * data[i] * (i/n - data[i]), minDiff );
     }
-    System.out.println("2 - Kolmogorov-Smirnov Test Triangular: " + minDiff + " " + maxDiff);
+
+    double diff;
+    if(maxDiff > minDiff)
+      diff = maxDiff;
+    else
+      diff = minDiff;
+
+    System.out.println("2 - Kolmogorov-Smirnov Triangular Test: " + minDiff + " " + 1.358);
   }
 
   public double TwoLevelTest(double d[]){
