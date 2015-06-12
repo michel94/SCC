@@ -53,22 +53,23 @@ public class Main{
 
   }
 
-  public double chiSquareTestTriangular(double data1[], double data2[]){
-    double sum=0;
-    double aux[] = new double[k];
+  public void KSTestTriangular(double d1[], double d2[]){
+    double data1[] = Arrays.copyOf(d1, d1.length);
+    double data2[] = Arrays.copyOf(d2, d2.length);
+    Arrays.sort(data1);
+    Arrays.sort(data2);
 
-    for(int i=0; i<data1.length; i++){
-      double max = max(data1[i], data2[i]);
-      aux[(int)max*k]++;
+    double maxDiff = 0.0, minDiff = 0.0;
+
+    for(int i=0; i<n; i++){
+      //System.out.println(data[i] + " " + (i+1)/(double)n);
+      double maxRandomNumber = max(data1[i],data2[i]);
+      double e = Math.pow(maxRandomNumber, 2);
+      maxDiff = max( Math.sqrt(n) * i * (i+1/(double)n - e ), maxDiff );
+      minDiff = max( Math.sqrt(n) * i * (e - (i)/(double)n ), minDiff );
+      //minDiff = max( Math.sqrt(n) * data[i] * (i/n - data[i]), minDiff );
     }
-
-    for(int i=0; i<aux.length; i++){
-      double e = Math.pow((i+1)/k, 2) - Math.pow(i/k, 2);
-      sum += Math.pow(aux[i] - e, 2) / e;
-    }
-
-    return sum;
-
+    System.out.println("Kolmogorov-Smirnov Test Triangular: " + minDiff + " " + maxDiff);
   }
 
   public double TwoLevelTest(double d[]){
@@ -253,9 +254,7 @@ public class Main{
     double limit = chiSquare(30*30-1, 1-0.05);
     System.out.println("TwoLevelTest " + trTest + " " + limit);
 */
-
-    double triangularDist = chiSquareTestTriangular(data, dataAux);
-    System.out.println("chiSquareDist: " + triangularDist);
+    KSTestTriangular(data, dataAux);
   }
 
   public static void main(String[] args) {
