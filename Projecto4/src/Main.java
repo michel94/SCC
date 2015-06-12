@@ -8,7 +8,7 @@ import java.io.*;
 public class Main{
   double data[];
   double dataAux[];
-  int n = 60000, k = 30;
+  int n = 600000, k = 30;
 
   public double max(double a, double b){
     if(a > b)
@@ -29,7 +29,7 @@ public class Main{
       minDiff = max( Math.sqrt(n) * i * (x - (i+1.0)/n ), minDiff );
       //minDiff = max( Math.sqrt(n) * data[i] * (i/n - data[i]), minDiff );
     }
-    System.out.println("Kolmogorov: " + minDiff + " " + maxDiff + " " + chiSquareDist(n, 0.05) );
+    System.out.println("Kolmogorov: " + minDiff + " " + maxDiff + " " + "TODO" );
   }
 
   public double coisa(int k){
@@ -37,7 +37,7 @@ public class Main{
   }
 
   public double crit(double value){
-    return -1.645;
+    return 1.645;
   }
 
   public double chiSquareDist(int k, double alpha){
