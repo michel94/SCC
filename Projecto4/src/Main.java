@@ -7,6 +7,7 @@ import java.io.*;
 
 public class Main{
   double data[];
+  double dataAux[];
   int n = 60000, k = 30;
 
   public double max(double a, double b){
@@ -47,6 +48,24 @@ public class Main{
     double sum=0;
     for(int i=0; i<data.length; i++){
       sum += Math.pow(data[i] - e, 2) / e;
+    }
+
+    return sum;
+
+  }
+
+  public double chiSquareTestTriangular(double data1[], double data2[]){
+    double sum=0;
+    double aux[] = new double[k];
+
+    for(int i=0; i<data1.length; i++){
+      double max = max(data1[i], data2[i]);
+      aux[(int)max*k]++;
+    }
+
+    for(int i=0; i<aux.length; i++){
+      double e = Math.pow((i+1)/k, 2) - Math.pow(i/k, 2);
+      sum += Math.pow(aux[i] - e, 2) / e;
     }
 
     return sum;
@@ -184,6 +203,7 @@ public class Main{
 
   public Main(){
     data = new double[n];
+    dataAux = new double[n];
     EmptyModel emptyModel = new EmptyModel();
     Experiment exp = new Experiment("MyExperiment", TimeUnit.SECONDS, TimeUnit.MINUTES, null);
     emptyModel.connectToExperiment(exp);
@@ -194,6 +214,7 @@ public class Main{
 
     for(int i=0; i<n; i++){
       data[i] = dist.sample();
+      dataAux[i] = dist.sample();
     }
 
     KSTest(data);
@@ -233,6 +254,9 @@ public class Main{
     double limit = chiSquare(30*30-1, 1-0.05);
     System.out.println("TwoLevelTest " + trTest + " " + limit);
 */
+
+    double triangularDist = chiSquareTestTriangular(data, dataAux);
+    System.out.println("chiSquareDist: " + triangularDist);
   }
 
   public static void main(String[] args) {

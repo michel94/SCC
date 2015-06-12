@@ -64,7 +64,7 @@ public class AVG extends SimProcess {
 				
 
 			}else{
-				if(false)
+				if(true)
 					moveTo(0);
 				passivate();
 			}

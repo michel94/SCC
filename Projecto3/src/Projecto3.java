@@ -27,5 +27,13 @@ public class Projecto3{
         for(int i=0; i<3; i++)
             System.out.println("Job Type:" + i + " AvgMeanWaitTime " + model.avgWaitTime[i] / model.finished + " QueueMeanWaitTime " + model.queueWaitTime[i] / model.finished );
         System.out.println("Mean Cycle Time: " + model.cycleTime / model.finished);
+
+        for(int i=0; i<model.stations.length;i++)
+        {
+            for(int k=0; k<model.stations[i].machines.length;k++)
+            {
+                System.out.println("Station: " + i + " Machine: " + k + " Working Time:" + model.stations[i].machines[k].totalWorkingTime + " Blocking Time:" + model.stations[i].machines[k].totalBlockedTime + " Idle Time:" + (2900*60.0 - model.stations[i].machines[k].totalWorkingTime - model.stations[i].machines[k].totalBlockedTime));
+            }
+        }
     }
 }
